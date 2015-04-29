@@ -1,0 +1,128 @@
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Dinesh</title>
+  <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" />
+  <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+  <script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
+  <style>
+  #toggle {
+    width: 5%;
+    height: 95%;
+    background: grey;
+	position: absolute;
+	color: white;
+	border: 1px solid #999999;
+  }
+  #themes {
+	width: 3%;
+    height: 50%;
+	margin-top: 15%;
+	background: black;
+	position: absolute;
+	color: white;
+  }
+  #themeColor1 {
+	background: black;
+  }
+  #themeColor1:hover {
+	background: lightgrey;
+  }
+  #themes:hover {
+	background: #500000;
+  }
+  #tabs {
+	margin-left: 5%;
+	width: 90%;
+	height: 95%;
+	background: white;
+  }
+ .tabsulRW {
+	background: #7a0000;
+  }
+  .tabsliRW {
+	background: #cc0000;
+	color: white;
+	align-center: true;
+  }
+ .tabsulGW {
+	background: #007a00;
+  }
+  .tabsliGW {
+	background: #00cc00;
+	color: white;
+	align-center: true;
+  }
+  #tabs li:hover {
+	background: #cc6600;
+  }
+  </style>
+  <script>
+  $(function() {
+    $( "#tabs" ).tabs();
+  });
+  </script>
+</head>
+<body bgcolor="black">
+<div id="toggle">  
+  <center>
+  <h4 id="themeColor1" >Red & Black</h4>
+  <h4 id="themeColor2" >Red & White</h4>
+  <h4 id="themeColor3">Blue & White</h4>
+  <h4 id="themeColor4">Green & White</h4>
+  <h4 id="themeColor5">Violet & White</h4>
+  <h4 id="themeColor6">Pink & White</h4>
+  <h4 id="themeColor7">Purple & White</h4>
+  <h4 id="themeColor8">White & White</h4>
+  </center>
+</div>
+<div id="themes">
+	<center><h4>C</h4>
+	<h4>O</h4>
+	<h4>L</h4>
+	<h4>O</h4>
+	<h4>U</h4>
+	<h4>R</h4>
+	<h4>S</h4></center>
+</div>
+<div id="tabs">
+  <ul class="tabsulRW">
+    <li class="tabsliRW"><a href="#tabs-1">Home</a></li>
+    <li class="tabsliRW"><a href="#tabs-2">About Me</a></li>
+    <li class="tabsliRW"><a href="myresume.html">My Resume</a></li>
+	<li class="tabsliRW"><a href="#tabs-4">My Projects</a></li>
+	<li class="tabsliRW"><a href="#tabs-5">Contact Me</a></li>
+  </ul>
+  <div id="tabs-1">
+    <p><img class="left" src="/myphoto.jpg" width="180" height="140" alt="" />
+							
+								I am <a href="mailto:dd.dinesh.rajakumar@gmail.com">D Dinesh</a> B.Tech IT, Doing my UG Degree at Saranathan College of Engineering, Trichy. Did my schoolings at Bishop Heber Higher Secondary School, Theppakulam, Trichy. </ br> 
+								Intrested in Programming - for me a Computer is a born child which can do everything what we say, problem is, it follows exactly what we say :), we can teach them, practice them, even educate them finally it will teach us :). Thats the Thing.</br>
+								Hobbies are listening songs(most of time melodious songs),Enjoing nature, Taking photos (acting like a photography but not), some electonic works - one of my intrest, and spending some time with friends (ofcource my PC is also one of my friend) . Just now get intrested in music, but 7 notes are very difficult then that of more then 100 keys in a computer key board, ahh.. have to learn music.</ br>
+								I have a policy that if any thing went wrong from hardware to software level, try to solve or atleast learn something from that.
+							</p>
+  </div>
+  <div id="tabs-2">
+    <p></p>
+  </div>
+  <div id="tabs-3">
+  </div>
+</div>
+<script>
+$( "#toggle" ).toggle( "drop" );
+$( "#toggle" ).click(function() {
+  $( "#toggle" ).toggle( "drop" );
+  $( "#themes" ).toggle( "show" );
+});
+$( "#themes" ).click(function() {
+	$( "#toggle" ).toggle( "drop");
+	$( "#themes" ).toggle( "hide" );
+	});
+$("#themeColor1").click(function(){
+ $( ".tabsulRW" ).switchClass( "tabsulRW", "tabsulGW", 1000 );
+      $( ".tabsliRW" ).switchClass( "tabsliRW", "tabsliGW", 1000 );
+      return false;
+});
+</script>
+</body>
+</html>

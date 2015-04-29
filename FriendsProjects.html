@@ -1,0 +1,108 @@
+<html>
+<head>
+<title>Friends Projects</title>
+<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+<script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
+<style>
+.header{
+position: absolute;
+top: 0%;
+left: 0%;
+width: 100%;
+height: 8%;
+background: grey;
+}
+.ip-form{
+position: absolute;
+top: 8%;
+left: 0%;
+width: 50%;
+height: 84%;
+background: lightgrey;
+}
+.op-form{
+position: absolute;
+top: 8%;
+left: 50%;
+width: 50%;
+height: 84%;
+background: lightgrey;
+}
+.footer{
+position: absolute;
+top: 92%;
+left: 0%;
+width: 100%;
+height: 8%;
+background: grey;
+}
+.side-button-hide{
+position: absolute;
+top: 35%;
+left: 0%;
+width: 25px;
+height: 100px;
+background: grey;
+}
+.side-button-hide:hover{
+color: white;
+}
+.side-button-show{
+position: absolute;
+top: 35%;
+left: 0%;
+width: 25px;
+height: 140px;
+background: grey;
+}
+.side-button-show:hover{
+color: white;
+}
+</style>
+</head>
+<body>
+<div class="header">
+<center>
+<h3>Simple PROJECT REPOSITORY of our Friends</h3>
+</center>
+</div>
+<div class="ip-form" id="ip-form">
+<center>
+<iframe id="JotFormIFrame" allowtransparency="true" src="http://form.jotform.me/form/31258913692460" frameborder="0" style="width:100%; height:100%; border:none;" scrolling="auto"></iframe>
+</center>
+</div>
+<div class="op-form" id="op-form">
+<center>
+<iframe src="http://www.jotform.com/table/31355553144046" frameborder="0" style="width: 100%; height: 100%; border:none;" scrolling="auto"></iframe>
+</center>
+</div>
+<div class="footer">
+<center>
+<h4>If You have any clarifications or Problems<a href="mailto:dd.dinesh.rajakumar@gmail.com" target="_blank"> Please mail Me (Click Here)</a> &nbsp; &copy;&nbsp; Dinesh.D All Rights Reserved :)</h4>
+</center>
+</div>
+<div class="side-button-hide" id="side-button-hide">
+<center><b>H</br>I</br>D</br>E</br>&lt;&lt</center>
+</div>
+<div class="side-button-show" id="side-button-show">
+<center><b>S</br>U</br>B</br>M</br>I</br>T</br>&gt;&gt</center>
+</div>
+<script>
+$( "#side-button-show" ).toggle( "drop" );
+$( "#side-button-hide" ).click(function() {
+$( "#ip-form" ).toggle( "drop" );
+$( "#side-button-hide" ).toggle( "drop" );
+$( "#side-button-show" ).toggle( "drop" );
+$("#op-form").animate({"left":"0%"}, "slow");
+$("#op-form").animate({"width":"100%"}, "slow");
+});
+$( "#side-button-show" ).click(function() {
+$( "#ip-form" ).toggle( "drop" );
+$( "#side-button-show" ).toggle( "drop" );
+$( "#side-button-hide" ).toggle( "drop" );
+$("#op-form").animate({"left":"50%"}, "slow");
+$("#op-form").animate({"width":"50%"}, "slow");
+});
+</script>
+</body>
+</html>
