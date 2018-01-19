@@ -26,4 +26,10 @@
     offset: 54
   });
 
+  $('#download_resume').on('click', function () {
+	  var doc = new jsPDF();
+	  doc.fromHTML($('#for_resume').html());
+	  doc.save('DineshD_Resume.pdf');
+  });
+
 })(jQuery); // End of use strict
