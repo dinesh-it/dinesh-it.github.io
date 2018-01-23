@@ -1,0 +1,401 @@
+---
+redirect_from: "/radio"
+---
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Tamil Online Radios</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+
+<!-- JQuery 3.2.1 -->
+<script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+
+<!-- Bootstrap 3.3.7 -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+<!-- Font awsome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<!-- jPlayer 2.9.2 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jplayer/2.9.2/jplayer/jquery.jplayer.min.js"></script>
+
+<script src="https://tnlite.github.io/static/tn.js"></script>
+<script type="text/javascript">
+	//<![CDATA[
+$(document).ready(function(){
+
+	var stop_class = 'glyphicon-stop';
+	var play_class = 'glyphicon-play';
+	var fav_class = 'glyphicon-star';
+	var de_fav_class = 'glyphicon-star-empty';
+	var tile_view_class = 'glyphicon-th';
+	var list_view_class = 'glyphicon-list';
+	var last_fm_div = '';
+	var radio_list_div = $('#radio-list');
+
+	var favorites = localStorage.getItem('favorites');
+	if(!favorites){
+		favorites = {};
+	}
+	else {
+		favorites = JSON.parse(favorites);
+	}
+
+	//$('#sleep_input').slider();
+	var get_list = function(json) {
+		var sample_div = $('<div class="list_element">'
+			+ '<div class="art"><span class="glyphicon glyphicon-music" aria-hidden="true"></span></div>'
+			+ '<div class="details">'
+			+ '<label>AR Rahman</label><br/>'
+			+ '<p>All time hits<p></div>'
+		+ '<span class="glyphicon glyphicon-star-empty right btn-icon favorite" aria-hidden="true"></span></div>');
+		sample_div.find('label').text(json.title);
+		sample_div.find('p').text(json.link);
+		sample_div.attr('data-link',json.mp3);
+		if(favorites[json.mp3]){
+			sample_div.find('.favorite').removeClass(de_fav_class).addClass(fav_class);
+			sample_div.addClass('favorite');
+		}
+		return sample_div;
+	};
+
+	var show_info = function(title,msg) {
+		var box = $('#info-box');
+		box.find('label').text(title);
+		box.find('p').text(msg);
+		box.show();
+	}
+
+	var wait_sec = 0;
+	var retry_play = function() {
+		var sec = 0;
+		if(wait_sec == 0) {
+			sec = 2;
+		}
+		else {
+			sec = wait_sec * 2;
+		}
+		wait_sec = sec;
+		window.setTimeout(function() {
+			jp.jPlayer('clearMedia');
+			last_fm_div.trigger('click');
+		}, sec * 1000);
+		show_info('Streaming failed!', 'Trying in ' + sec + ' secs');
+	}
+
+	$(document).on($.jPlayer.event.waiting, function() {
+		show_info('Loading...',  '');
+	});
+
+	$(document).on($.jPlayer.event.playing, function() {
+		$('#info-box').hide();
+		$('#play_btn').removeClass(play_class);
+		$('#play_btn').addClass(stop_class);
+		wait_sec = 0;
+	});
+
+	$(document).on($.jPlayer.event.play, function() {
+		$('#info-box').hide();
+		$('#play_btn').removeClass(play_class);
+		$('#play_btn').addClass(stop_class);
+		wait_sec = 0;
+	});
+
+	$(document).on($.jPlayer.event.pause, function() {
+		$('#play_btn').addClass(play_class);
+		$('#play_btn').removeClass(stop_class);
+	});
+
+	$(document).on($.jPlayer.event.loadstart, function() {
+		console.log("Load started...");
+	});
+
+	// No use, since its trigered on each play.
+	//$(document).on($.jPlayer.event.suspend, function() {
+	//});
+
+	$(document).on($.jPlayer.event.ended, function() {
+		alert("Stream ended...!");
+	});
+
+	$(document).on($.jPlayer.event.stalled, function() {
+		retry_play();
+	});
+
+	$(document).on($.jPlayer.event.error, function(a,b) {
+		console.log('Error...');
+		retry_play();
+	});
+
+	//$(document).on($.jPlayer.event.progress, function() {
+	//	show_info('Downloading...',  '');
+	//});
+
+	var jp = $("#jquery_jplayer_1").jPlayer({
+		swfPath: "https://cdnjs.cloudflare.com/ajax/libs/jplayer/2.9.2/jplayer/jquery.jplayer.swf",
+		supplied: "mp3, oga", 
+	});
+
+	$(document).on('click','.list_element', function() {
+		last_fm_div = $(this);
+		$('#radio-list div').removeClass('selected');
+		var link = $(this).data('link');
+		last_fm_div.addClass('selected');
+		console.log(link);
+		jp.jPlayer('clearMedia');
+		jp.jPlayer('setMedia', { mp3: link });
+		jp.jPlayer('play');
+	});
+
+	$('#play_btn').on('click', function() {
+		if($('#play_btn').hasClass(play_class)){
+			if(!last_fm_div){
+				last_fm_div = $('#radio-list').find('.list_element:visible:first');
+			}
+			last_fm_div.trigger('click');
+		}
+		else {
+			jp.jPlayer('clearMedia');
+			$('#play_btn').removeClass(stop_class);
+			$('#play_btn').addClass(play_class);
+		}
+	});
+
+	$(document).on('click','span.favorite', function(e) {
+		e.stopPropagation();
+		var sel = $(this);
+		var parent = sel.parent();
+		var link = parent.data('link');
+		if(sel.hasClass(de_fav_class)){
+			sel.removeClass(de_fav_class);
+			sel.addClass(fav_class);
+			parent.addClass('favorite');
+			favorites[link] = 1;
+		}
+		else {
+			sel.removeClass(fav_class);
+			sel.addClass(de_fav_class);
+			parent.removeClass('favorite');
+			delete favorites[link];
+		}
+		localStorage.setItem('favorites', JSON.stringify(favorites));
+	});
+
+	$('#show_fav').on('click',function(){
+		var btn = $(this);
+		var list = $('#radio-list');
+		if(btn.hasClass('show_fav')){
+			btn.removeClass('show_fav');
+			btn.removeClass(de_fav_class);
+			btn.addClass(fav_class);
+			list.find(".list_element:not(.favorite)").hide();
+		}
+		else {
+			btn.addClass('show_fav');
+			btn.removeClass(fav_class);
+			btn.addClass(de_fav_class);
+			list.find("div:not([class='favorite'])").show();
+		}
+	});
+	
+	$('#toggle_view').on('click', function() {
+		if($('#radio-list div:first').hasClass('tile_view')) {
+			$('#radio-list div').removeClass('tile_view');
+			$(this).addClass(tile_view_class);
+			$(this).removeClass(list_view_class);
+		}
+		else {
+			$('#radio-list div').addClass('tile_view');
+			$(this).removeClass(tile_view_class);
+			$(this).addClass(list_view_class);
+		}
+	});
+
+	var radio_src = objMain['Channels'];
+	$.each(radio_src, function(name,link){
+		var temp = {
+			title: name,
+			mp3: link
+		};
+		var div = get_list(temp);
+		radio_list_div.append(div);
+	});
+
+	$('#info-box').hide();
+
+	$(window).bind("beforeunload", function() { 
+		return $('#play_btn').hasClass(play_class) ? null : "Do you want to stop and exit?"; 
+	});
+});
+//]]>
+</script>
+	<style>
+		.list_element {
+			border-bottom: 1px solid grey;
+			height: 48px;
+			margin-bottom: 1px;
+			padding: 5px;
+		}
+		.list_element label {
+			margin-bottom: 0px;
+		}
+		.icon-btn {
+
+		}
+		.list_element p {
+			margin-top: 1px;
+			font-size: 10px;
+		}
+		.list_element .art {
+			height: 35px;
+			width: 35px;
+			display: inline-block;
+			background: lightgrey;
+			float: left;
+			padding: 5px;
+			font-size: 23px;
+		}
+		.list_element .details {
+			display: inline-block;
+			margin-left: 10px;
+		}
+		#title-bar {
+			border-bottom: 1px solid grey;
+			height: 40px;
+			margin-bottom: 1px;
+			padding: 5px;
+			text-align: center;
+		}
+		#title-bar button {
+			height: 28px;
+			margin-right: 3px;
+		}
+		#title-bar span {
+			padding-left: 8px;
+			padding-right: 8px;
+			text-align: center;
+			font-size: 20px;
+		}
+		#advertisement {
+			border-bottom: 1px solid grey;
+			height: 40px;
+			margin-bottom: 1px;
+			padding: 10px;
+			text-align: center;
+		}
+		#radio-list {
+			height: 80vh;
+			overflow: auto;
+		}
+		#player {
+			position: fixed;
+			width: 100%;
+			left: 0vw;
+			bottom: 0vh;
+			background: #FFFFFF;
+			height: 50px;
+			right: 1px;
+			padding: 8px;
+			text-align: center;
+			font-size: 28px;
+			letter-spacing: 16px;
+			box-shadow: 0px -1px 10px rgba(50, 50, 50, 0.75);
+		}
+		.left {
+			float: left;
+		}
+		.right {
+			float: right;
+		}
+		span.btn-icon {
+			font-size: 24px;
+			line-height: 24px;
+			padding: 6px;
+		}
+		button.glyphicon-play {
+			color: green;
+		}
+		button.glyphicon-stop {
+			color: red;
+		}
+		div.selected {
+			box-shadow: 3px 3px 15px #666;
+			border-color:#3c763d;
+			background: #59a05a;
+			color: #fff;
+			cursor: pointer;
+			text-shadow: 1px 1px 1px #666;
+		}
+		div.selected .art {
+			box-shadow: 2px 2px 10px #666;
+			color: green;
+		}
+		div.info {
+			position: absolute;
+			z-index: 99;
+			background: #efda8e;
+			border-radius: 10px;
+			padding-left: 12px;
+			padding-right: 12px;
+			text-align: center;
+			top: 16px;
+			left: 40vw;
+			padding-top: 4px;
+			padding-bottom: 0px;
+		}
+		span.glyphicon-star {
+			color: yellow;
+			text-shadow: 1px 1px 6px #666;
+		}
+		button {
+			text-shadow: 1px 1px 10px #666;
+		}
+		button.inactive {
+			text-shadow: 0px 0px 0px;
+			color: grey;
+		}
+		.list_element.tile_view {
+			border: 1px solid black;
+			box-shadow: 1px 1px 5px #666;
+			margin: 1px;
+			height: 50px;
+			padding: 5px;
+			min-width: 100px;
+			display: inline-block !important;
+		}
+		.details.tile_view {
+			width: 80px;
+			vertical-align: middle;
+			line-height: 15px;
+		}
+		.tile_view p {
+			display: none;
+		}
+	</style>
+</head>
+<body>
+	<div id="info-box" class="info"><label>Loading...</label><br/><p></p></div>
+	<div id="jquery_jplayer_1" class="jp-jplayer"></div>
+	<div id="title-bar">
+		<button class="glyphicon glyphicon glyphicon-menu-hamburger left inactive" aria-hidden="true"></button>
+		<button class="glyphicon glyphicon-list-alt left inactive" aria-hidden="true"></button>
+		<label>Tamil Radio</label>
+		<button id="share-photo" class="glyphicon glyphicon-share-alt right inactive" aria-hidden="true"></button>
+		<button class="glyphicon glyphicon-search right inactive" aria-hidden="true"></button>
+	</div>
+	<div id="advertisement" class="hide">ADVERTISEMENT</div>
+	<div id="radio-list"></div>
+	<div id="player">
+		<!-- <input id="sleep_input" type="text" data-slider-min="0" data-slider-max="120" data-slider-step="1" data-slider-value="0" data-slider-orientation="vertical"/> -->
+		<button class="glyphicon glyphicon-time inactive" aria-hidden="true"></button>
+		<button id="show_fav" class="glyphicon glyphicon-star-empty show_fav" aria-hidden="true"></button>
+		<button id="play_btn" class="glyphicon glyphicon-play" aria-hidden="true"></button>
+		<button id="toggle_view" class="glyphicon glyphicon-th" aria-hidden="true"></button>
+		<button class="glyphicon glyphicon-comment inactive" aria-hidden="true"></button>
+	</div>
+</body>
+
+</html>
