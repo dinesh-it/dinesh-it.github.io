@@ -251,15 +251,26 @@ $(document).ready(function(){
 		return $('#play_btn').hasClass(play_class) ? null : "Do you want to stop and exit?"; 
 	});
 
-	$('document').ready(function(){
-		$('body').jplist({				
-			itemsBox: '#radio-list', 
-			itemPath: '.list_element',
-			panelPath: '.jplist-panel'	
-		});
-
+	$('body').jplist({				
+		itemsBox: '#radio-list', 
+		itemPath: '.list_element',
+		panelPath: '.jplist-panel'	
 	});
 
+	$(window).bind('keydown', function(event) {
+		if (event.ctrlKey || event.metaKey) {
+			switch (String.fromCharCode(event.which).toLowerCase()) {
+				case 's':
+					event.preventDefault();
+					$('#radio-search').focus();
+					break;
+				case 'f':
+					event.preventDefault();
+					$('#radio-search').focus();
+					break;
+			}
+		}
+	});
 });
 //]]>
 </script>
@@ -418,7 +429,7 @@ $(document).ready(function(){
 		<button id="share-photo" class="hide glyphicon glyphicon-share-alt right inactive" aria-hidden="true"></button>
 		<div class="right search-bar">
 		<div class="text-filter-box jplist-panel">
-			<input data-path=".radio_name" 
+			<input id="radio-search" data-path=".radio_name" 
 			type="text" 
 			class="jplist-no-right-border"
 			placeholder="Search Radio" 
