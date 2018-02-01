@@ -35,6 +35,15 @@ redirect_from: "/radio/"
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jplayer/2.9.2/jplayer/jquery.jplayer.min.js"></script>
 
 <script src="https://tnlite.github.io/static/tn.js"></script>
+
+<!-- jPList Core -->		
+<link href="css/jplist.core.min.css" rel="stylesheet" type="text/css" />
+<script src="js/jplist.core.min.js"></script>	
+
+<!-- Textbox Control -->			
+<link href="css/jplist.textbox-filter.min.css" rel="stylesheet" type="text/css" />
+<script src="js/jplist.textbox-filter.min.js"></script>
+
 <script type="text/javascript">
 	//<![CDATA[
 $(document).ready(function(){
@@ -61,7 +70,7 @@ $(document).ready(function(){
 		var sample_div = $('<div class="list_element">'
 			+ '<div class="art"><span class="glyphicon glyphicon-music" aria-hidden="true"></span></div>'
 			+ '<div class="details">'
-			+ '<label>AR Rahman</label><br/>'
+			+ '<label class="radio_name">AR Rahman</label><br/>'
 			+ '<p>All time hits<p></div>'
 		+ '<span class="glyphicon glyphicon-star-empty right btn-icon favorite" aria-hidden="true"></span></div>');
 		sample_div.find('label').text(json.title);
@@ -212,7 +221,7 @@ $(document).ready(function(){
 			list.find("div:not([class='favorite'])").show();
 		}
 	});
-	
+
 	$('#toggle_view').on('click', function() {
 		if($('#radio-list div:first').hasClass('tile_view')) {
 			$('#radio-list div').removeClass('tile_view');
@@ -241,6 +250,16 @@ $(document).ready(function(){
 	$(window).bind("beforeunload", function() { 
 		return $('#play_btn').hasClass(play_class) ? null : "Do you want to stop and exit?"; 
 	});
+
+	$('document').ready(function(){
+		$('body').jplist({				
+			itemsBox: '#radio-list', 
+			itemPath: '.list_element',
+			panelPath: '.jplist-panel'	
+		});
+
+	});
+
 });
 //]]>
 </script>
@@ -395,8 +414,23 @@ $(document).ready(function(){
 		<button class="glyphicon glyphicon glyphicon-menu-hamburger left inactive" aria-hidden="true"></button>
 		<button class="glyphicon glyphicon-list-alt left inactive" aria-hidden="true"></button>
 		<label>Tamil Radio</label>
+		<!-- filter by title -->
 		<button id="share-photo" class="glyphicon glyphicon-share-alt right inactive" aria-hidden="true"></button>
-		<button class="glyphicon glyphicon-search right inactive" aria-hidden="true"></button>
+		<div class="right search-bar">
+		<div class="text-filter-box jplist-panel">
+			<input data-path=".radio_name" 
+			type="text" 
+			class="jplist-no-right-border"
+			placeholder="Search Radio" 
+			data-control-type="textbox" 
+			data-control-name="title-filter" 
+			data-control-action="filter"
+			/>
+
+			<!-- clear textbox button -->
+			<i class="fa fa-times-circle jplist-clear" data-type="clear"></i>
+		</div>
+		</div>
 	</div>
 	<div id="advertisement" class="hide">ADVERTISEMENT</div>
 	<div id="radio-list"></div>
