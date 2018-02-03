@@ -59,11 +59,8 @@ $(document).ready(function(){
 	var safari_ua = 0;
 
 	var ua = navigator.userAgent.toLowerCase(); 
-	if (ua.indexOf('safari') != -1) { 
-		if (ua.indexOf('chrome') < 0) {
-			safari_ua = 1;
-			console.log("Found this UA as Safari, So favorites should not work");
-		}
+	if (ua.indexOf('safari') != -1 && ua.indexOf('chrome') < 1) {
+		safari_ua = 1;
 	}
 
 	var favorites;
@@ -71,8 +68,8 @@ $(document).ready(function(){
 		localStorage.getItem('favorites');
 	}
 	else {
-		$('span.favorite').hide();
 		$('#show_fav').hide();
+		console.log("Found this UA as Safari, So favorites should not work");
 	}
 
 	if(!favorites){
@@ -89,10 +86,14 @@ $(document).ready(function(){
 			+ '<div class="details">'
 			+ '<label class="radio_name">AR Rahman</label><br/>'
 			+ '<p>All time hits<p></div>'
-		+ '<span class="glyphicon glyphicon-star-empty right btn-icon favorite" aria-hidden="true"></span></div>');
+			+ '<span class="glyphicon glyphicon-star-empty right btn-icon favorite" aria-hidden="true"></span></div>'
+		);
 		sample_div.find('label').text(json.title);
 		sample_div.find('p').text(json.link);
 		sample_div.attr('data-link',json.mp3);
+		if(safari_ua) {
+			sample_div.find('.favorite').hide();
+		}
 		if(favorites[json.mp3]){
 			sample_div.find('.favorite').removeClass(de_fav_class).addClass(fav_class);
 			sample_div.addClass('favorite');
