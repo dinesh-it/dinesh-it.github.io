@@ -60,6 +60,7 @@ $(document).ready(function(){
 
 	var ua = navigator.userAgent.toLowerCase(); 
 	if (ua.indexOf('safari') != -1) { 
+		alert(ua);
 		if (ua.indexOf('chrome') != -1) {
 			safari_ua = 1;
 			console.log("Found this UA as Safari, So favorites should not work");
