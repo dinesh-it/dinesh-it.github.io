@@ -289,6 +289,35 @@ $(document).ready(function(){
 			}
 		}
 	});
+
+	window.displayBoxIndex = -1;
+
+	$("body").keyup(function(e) 
+	{
+		if (e.keyCode == 40) 
+		{  
+			move_list(1);
+		}
+		else if(e.keyCode == 38)
+		{
+			move_list(-1);
+		}
+		else if(e.keyCode == 13){
+			last_fm_div.trigger('click');
+		}
+
+	});
+
+	function move_list(p) {
+		displayBoxIndex += p;
+		var oBoxCollection = $(".list_element");
+		if (displayBoxIndex >= oBoxCollection.length)
+			displayBoxIndex = 0;
+		if (displayBoxIndex < 0)
+			displayBoxIndex = oBoxCollection.length - 1;
+		var cssClass = "list_element_hover";
+		last_fm_div = oBoxCollection.removeClass(cssClass).eq(displayBoxIndex).addClass(cssClass);
+	};
 });
 //]]>
 </script>
@@ -434,6 +463,12 @@ $(document).ready(function(){
 		.tile_view p {
 			display: none;
 		}
+
+		.list_element_hover, .list_element:hover
+		{
+			background:#3b5998;
+			color:#FFFFFF;
+		}
 	</style>
 </head>
 <body>
@@ -451,7 +486,7 @@ $(document).ready(function(){
 			<input id="radio-search" data-path=".radio_name" 
 			type="text" 
 			class="jplist-no-right-border"
-			placeholder="Search Radio" 
+			placeholder="Search (Ctrl + S)" 
 			data-control-type="textbox" 
 			data-control-name="title-filter" 
 			data-control-action="filter"
