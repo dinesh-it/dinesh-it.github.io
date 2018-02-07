@@ -85,7 +85,7 @@ $(document).ready(function(){
 			+ '<div class="art"><span class="glyphicon glyphicon-music" aria-hidden="true"></span></div>'
 			+ '<div class="details">'
 			+ '<label class="radio_name">AR Rahman</label><br/>'
-			+ '<p>All time hits<p></div>'
+			+ '<p class="title">All time hits<p></div>'
 			+ '<span class="glyphicon glyphicon-star-empty right btn-icon favorite" aria-hidden="true"></span></div>'
 		);
 		sample_div.find('label').text(json.title);
@@ -100,6 +100,30 @@ $(document).ready(function(){
 		}
 		return sample_div;
 	};
+
+	function song_title() {
+		$('object').remove();
+		var selected_div = $('.list_element.selected');
+		var current_url = selected_div.data('link');
+		var host = host_name(current_url);
+		if(host) {
+			var url = host + '/' + 'currentsong?sid=1';
+			var html = '<object class="song-title" data=' + url + '></object>';
+			console.log(html);
+			selected_div.find('p.title').html(html);
+		}
+		console.log('setting title');
+	};
+
+
+	var intervalID = setInterval(function(){
+		song_title();
+	}, 30000);
+
+
+	/*intervalID = setInterval(function(){
+		console.log($('.song-title').html());
+	}, 13000);*/
 
 	var show_info = function(title,msg) {
 		var box = $('#info-box');
@@ -196,6 +220,7 @@ $(document).ready(function(){
 		jp.jPlayer('clearMedia');
 		jp.jPlayer('setMedia', { mp3: link });
 		jp.jPlayer('play');
+		song_title();
 	});
 
 	$('#play_btn').on('click', function() {
@@ -328,9 +353,19 @@ $(document).ready(function(){
 		last_fm_div = oBoxCollection.removeClass(cssClass).eq(displayBoxIndex).addClass(cssClass);
 	};
 
+	function host_name(link) {
+		if(!link) {
+			return 0;
+		}
+		if (link.indexOf("://") > -1) {
+			var parts = link.split('/');
+			return parts[0] + '/' + parts[1] + '/' + parts[2];
+		}
+		return 0;
+	};
+
 	$('#radio-list').scroll(function(e){
 		var selected_div = $('.list_element.selected');
-		console.log($('#radio-list').position().top);
 		if(!selected_div.length) {
 			return;
 		}
@@ -499,6 +534,14 @@ $(document).ready(function(){
 			width: 100%;
 			z-index: 100;
 		}
+		p.title object {
+			margin-top: -8px;
+			margin-left: -4px;
+			z-index: -1;
+		};
+		pre {
+			color: white;
+		}
 	</style>
 </head>
 <body>
@@ -536,6 +579,7 @@ $(document).ready(function(){
 		<button id="toggle_view" class="glyphicon glyphicon-th" aria-hidden="true"></button>
 		<button class="hide glyphicon glyphicon-comment inactive" aria-hidden="true"></button>
 	</div>
+	<div id="corss-data"></div>
 </body>
 
 </html>
