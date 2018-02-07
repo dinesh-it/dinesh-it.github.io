@@ -161,7 +161,7 @@ $(document).ready(function(){
 	});
 
 	$(document).on($.jPlayer.event.stalled, function() {
-		retry_play();
+		console.log('Player stopped');
 	});
 
 	$(document).on($.jPlayer.event.error, function(a,b) {
@@ -178,9 +178,18 @@ $(document).ready(function(){
 		supplied: "mp3, oga", 
 	});
 
+	var playing_div_top = 0;
 	$(document).on('click','.list_element', function() {
 		last_fm_div = $(this);
+		if(last_fm_div.hasClass('selected')) {
+			last_fm_div.removeClass('selected');
+			last_fm_div.removeClass('list_element_fixed');
+			jp.jPlayer('stop');
+			return;
+		}
 		$('#radio-list div').removeClass('selected');
+		last_fm_div.removeClass('list_element_fixed');
+		playing_div_top = last_fm_div.position().top;
 		var link = $(this).data('link');
 		last_fm_div.addClass('selected');
 		console.log(link);
@@ -318,6 +327,21 @@ $(document).ready(function(){
 		var cssClass = "list_element_hover";
 		last_fm_div = oBoxCollection.removeClass(cssClass).eq(displayBoxIndex).addClass(cssClass);
 	};
+
+	$('#radio-list').scroll(function(e){
+		var selected_div = $('.list_element.selected');
+		console.log($('#radio-list').position().top);
+		if(!selected_div.length) {
+			return;
+		}
+		var top = selected_div.position().top;
+		if (top < 42 && !selected_div.hasClass('list_element_fixed')) {
+			selected_div.addClass('list_element_fixed');
+		}
+		else if (top > 40 && selected_div.hasClass('list_element_fixed')) {
+			selected_div.removeClass('list_element_fixed');
+		}
+	});
 });
 //]]>
 </script>
@@ -469,6 +493,12 @@ $(document).ready(function(){
 			background:#3b5998;
 			color:#FFFFFF;
 		}
+		.list_element_fixed {
+			position: fixed;
+			top: 40px;
+			width: 100%;
+			z-index: 100;
+		}
 	</style>
 </head>
 <body>
@@ -497,7 +527,6 @@ $(document).ready(function(){
 		</div>
 		</div>
 	</div>
-	<div id="advertisement" class="hide">ADVERTISEMENT</div>
 	<div id="radio-list"></div>
 	<div id="player">
 		<!-- <input id="sleep_input" type="text" data-slider-min="0" data-slider-max="120" data-slider-step="1" data-slider-value="0" data-slider-orientation="vertical"/> -->
