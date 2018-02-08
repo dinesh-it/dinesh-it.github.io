@@ -105,6 +105,9 @@ $(document).ready(function(){
 		$('object').remove();
 		var selected_div = $('.list_element.selected');
 		var current_url = selected_div.data('link');
+		if(!current_url.indexOf('212.83.138.48')){
+			return undef;
+		}
 		var host = host_name(current_url);
 		if(host) {
 			var url = host + '/' + 'currentsong?sid=1';
