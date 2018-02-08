@@ -3,386 +3,388 @@ redirect_from: "/radio/"
 ---
 <!DOCTYPE html>
 <html>
-<head>
+	<head>
 		<!-- Global site tag (gtag.js) - Google Analytics -->
-		<script async src="https://www.googletagmanager.com/gtag/js?idÚA-113057440-3"></script>
+		<script async src="https://www.googletagmanager.com/gtag/js?id=UA-113057440-3"></script>
 		<script>
 			window.dataLayer = window.dataLayer || [];
 			function gtag(){dataLayer.push(arguments);}
 			gtag('js', new Date());
-
 			gtag('config', 'UA-113057440-3');
 		</script>
 
-<meta charset="utf-8" />
-<title>Tamil Online Radios</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-<meta name="title" property="og:title" content="Tamil Radio - Online" />
-<meta name="description" property="og:description" content="Listen to unlimited tamil songs from 100+ channels worldwide. Ilayaraja, ARRahman, US Tamil FM, Yuvan Hits etc..." />
+		<meta charset="utf-8" />
+		<title>Tamil Online Radios</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+		<meta name="title" property="og:title" content="Tamil Radio - Online" />
+		<meta name="description" property="og:description" content="Listen to unlimited tamil songs from 100+ channels worldwide. Ilayaraja, ARRahman, US Tamil FM, Yuvan Hits etc..." />
 
-<!-- JQuery 3.2.1 -->
-<script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+		<!-- JQuery 3.2.1 -->
+		<script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
 
-<!-- Bootstrap 3.3.7 -->
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+		<!-- Bootstrap 3.3.7 -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 
-<!-- Font awsome -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+		<!-- Font awsome -->
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
-<!-- jPlayer 2.9.2 -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jplayer/2.9.2/jplayer/jquery.jplayer.min.js"></script>
+		<!-- jPlayer 2.9.2 -->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jplayer/2.9.2/jplayer/jquery.jplayer.min.js"></script>
 
-<script src="https://tnlite.github.io/static/tn.js"></script>
+		<script src="https://tnlite.github.io/static/tn.js"></script>
 
-<!-- jPList Core -->		
-<link href="css/jplist.core.min.css" rel="stylesheet" type="text/css" />
-<script src="js/jplist.core.min.js"></script>	
+		<!-- jPList Core -->		
+		<link href="css/jplist.core.min.css" rel="stylesheet" type="text/css" />
+		<script src="js/jplist.core.min.js"></script>	
 
-<!-- Textbox Control -->			
-<link href="css/jplist.textbox-filter.min.css" rel="stylesheet" type="text/css" />
-<script src="js/jplist.textbox-filter.min.js"></script>
+		<!-- Textbox Control -->			
+		<link href="css/jplist.textbox-filter.min.css" rel="stylesheet" type="text/css" />
+		<script src="js/jplist.textbox-filter.min.js"></script>
 
-<script type="text/javascript">
-	//<![CDATA[
-$(document).ready(function(){
+		<script type="text/javascript">
+			//<![CDATA[
+		$(document).ready(function(){
 
-	var stop_class = 'glyphicon-stop';
-	var play_class = 'glyphicon-play';
-	var fav_class = 'glyphicon-star';
-	var de_fav_class = 'glyphicon-star-empty';
-	var tile_view_class = 'glyphicon-th';
-	var list_view_class = 'glyphicon-list';
-	var last_fm_div = '';
-	var radio_list_div = $('#radio-list');
-	var safari_ua = 0;
+			var stop_class = 'glyphicon-stop';
+			var play_class = 'glyphicon-play';
+			var fav_class = 'glyphicon-star';
+			var de_fav_class = 'glyphicon-star-empty';
+			var tile_view_class = 'glyphicon-th';
+			var list_view_class = 'glyphicon-list';
+			var last_fm_div = '';
+			var radio_list_div = $('#radio-list');
+			var safari_ua = 0;
 
-	var ua = navigator.userAgent.toLowerCase(); 
-	if (ua.indexOf('safari') != -1 && ua.indexOf('chrome') < 1) {
-		safari_ua = 1;
-	}
-
-	var favorites;
-	if(!safari_ua) {
-		localStorage.getItem('favorites');
-	}
-	else {
-		$('#show_fav').hide();
-		console.log("Found this UA as Safari, So favorites should not work");
-	}
-
-	if(!favorites){
-		favorites = {};
-	}
-	else {
-		favorites = JSON.parse(favorites);
-	}
-
-	//$('#sleep_input').slider();
-	var get_list = function(json) {
-		var sample_div = $('<div class="list_element">'
-			+ '<div class="art"><span class="glyphicon glyphicon-music" aria-hidden="true"></span></div>'
-			+ '<div class="details">'
-			+ '<label class="radio_name">AR Rahman</label><br/>'
-			+ '<p class="title">All time hits<p></div>'
-			+ '<span class="glyphicon glyphicon-star-empty right btn-icon favorite" aria-hidden="true"></span></div>'
-		);
-		sample_div.find('label').text(json.title);
-		sample_div.find('p').text(json.link);
-		sample_div.attr('data-link',json.mp3);
-		if(safari_ua) {
-			sample_div.find('.favorite').hide();
-		}
-		if(favorites[json.mp3]){
-			sample_div.find('.favorite').removeClass(de_fav_class).addClass(fav_class);
-			sample_div.addClass('favorite');
-		}
-		return sample_div;
-	};
-
-	function song_title() {
-		$('object').remove();
-		var selected_div = $('.list_element.selected');
-		var current_url = selected_div.data('link');
-		if(!current_url.indexOf('212.83.138.48')){
-			return undef;
-		}
-		var host = host_name(current_url);
-		if(host) {
-			var url = host + '/' + 'currentsong?sid=1';
-			var html = '<object class="song-title" data=' + url + '></object>';
-			console.log(html);
-			selected_div.find('p.title').html(html);
-		}
-		console.log('setting title');
-	};
-
-
-	var intervalID = setInterval(function(){
-		song_title();
-	}, 30000);
-
-
-	/*intervalID = setInterval(function(){
-		console.log($('.song-title').html());
-	}, 13000);*/
-
-	var show_info = function(title,msg) {
-		var box = $('#info-box');
-		box.find('label').text(title);
-		box.find('p').text(msg);
-		box.show();
-	}
-
-	var wait_sec = 0;
-	var retry_play = function() {
-		var sec = 0;
-		if(wait_sec == 0) {
-			sec = 2;
-		}
-		else {
-			sec = wait_sec * 2;
-		}
-		wait_sec = sec;
-		window.setTimeout(function() {
-			jp.jPlayer('clearMedia');
-			last_fm_div.trigger('click');
-		}, sec * 1000);
-		show_info('Streaming failed!', 'Trying in ' + sec + ' secs');
-	}
-
-	$(document).on($.jPlayer.event.waiting, function() {
-		show_info('Loading...',  '');
-	});
-
-	$(document).on($.jPlayer.event.playing, function() {
-		$('#info-box').hide();
-		$('#play_btn').removeClass(play_class);
-		$('#play_btn').addClass(stop_class);
-		wait_sec = 0;
-	});
-
-	$(document).on($.jPlayer.event.play, function() {
-		$('#info-box').hide();
-		$('#play_btn').removeClass(play_class);
-		$('#play_btn').addClass(stop_class);
-		wait_sec = 0;
-	});
-
-	$(document).on($.jPlayer.event.pause, function() {
-		$('#play_btn').addClass(play_class);
-		$('#play_btn').removeClass(stop_class);
-	});
-
-	$(document).on($.jPlayer.event.loadstart, function() {
-		console.log("Load started...");
-	});
-
-	// No use, since its trigered on each play.
-	//$(document).on($.jPlayer.event.suspend, function() {
-	//});
-
-	$(document).on($.jPlayer.event.ended, function() {
-		alert("Stream ended...!");
-	});
-
-	$(document).on($.jPlayer.event.stalled, function() {
-		console.log('Player stopped');
-	});
-
-	$(document).on($.jPlayer.event.error, function(a,b) {
-		console.log('Error...');
-		retry_play();
-	});
-
-	//$(document).on($.jPlayer.event.progress, function() {
-	//	show_info('Downloading...',  '');
-	//});
-
-	var jp = $("#jquery_jplayer_1").jPlayer({
-		swfPath: "https://cdnjs.cloudflare.com/ajax/libs/jplayer/2.9.2/jplayer/jquery.jplayer.swf",
-		supplied: "mp3, oga", 
-	});
-
-	var playing_div_top = 0;
-	$(document).on('click','.list_element', function() {
-		last_fm_div = $(this);
-		if(last_fm_div.hasClass('selected')) {
-			last_fm_div.removeClass('selected');
-			last_fm_div.removeClass('list_element_fixed');
-			jp.jPlayer('stop');
-			return;
-		}
-		$('#radio-list div').removeClass('selected');
-		last_fm_div.removeClass('list_element_fixed');
-		playing_div_top = last_fm_div.position().top;
-		var link = $(this).data('link');
-		last_fm_div.addClass('selected');
-		console.log(link);
-		jp.jPlayer('clearMedia');
-		jp.jPlayer('setMedia', { mp3: link });
-		jp.jPlayer('play');
-		song_title();
-	});
-
-	$('#play_btn').on('click', function() {
-		if($('#play_btn').hasClass(play_class)){
-			if(!last_fm_div){
-				last_fm_div = $('#radio-list').find('.list_element:visible:first');
+			var ua = navigator.userAgent.toLowerCase(); 
+			if (ua.indexOf('safari') != -1 && ua.indexOf('chrome') < 1) {
+				safari_ua = 1;
 			}
-			last_fm_div.trigger('click');
-		}
-		else {
-			jp.jPlayer('clearMedia');
-			$('#play_btn').removeClass(stop_class);
-			$('#play_btn').addClass(play_class);
-		}
-	});
 
-	$(document).on('click','span.favorite', function(e) {
-		e.stopPropagation();
-		var sel = $(this);
-		var parent = sel.parent();
-		var link = parent.data('link');
-		if(sel.hasClass(de_fav_class)){
-			sel.removeClass(de_fav_class);
-			sel.addClass(fav_class);
-			parent.addClass('favorite');
-			favorites[link] = 1;
-		}
-		else {
-			sel.removeClass(fav_class);
-			sel.addClass(de_fav_class);
-			parent.removeClass('favorite');
-			delete favorites[link];
-		}
-		localStorage.setItem('favorites', JSON.stringify(favorites));
-	});
-
-	$('#show_fav').on('click',function(){
-		var btn = $(this);
-		var list = $('#radio-list');
-		if(btn.hasClass('show_fav')){
-			btn.removeClass('show_fav');
-			btn.removeClass(de_fav_class);
-			btn.addClass(fav_class);
-			list.find(".list_element:not(.favorite)").hide();
-		}
-		else {
-			btn.addClass('show_fav');
-			btn.removeClass(fav_class);
-			btn.addClass(de_fav_class);
-			list.find("div:not([class='favorite'])").show();
-		}
-	});
-
-	$('#toggle_view').on('click', function() {
-		if($('#radio-list div:first').hasClass('tile_view')) {
-			$('#radio-list div').removeClass('tile_view');
-			$(this).addClass(tile_view_class);
-			$(this).removeClass(list_view_class);
-		}
-		else {
-			$('#radio-list div').addClass('tile_view');
-			$(this).removeClass(tile_view_class);
-			$(this).addClass(list_view_class);
-		}
-	});
-
-	var radio_src = objMain['Channels'];
-	$.each(radio_src, function(name,link){
-		var temp = {
-			title: name,
-			mp3: link
-		};
-		var div = get_list(temp);
-		radio_list_div.append(div);
-	});
-
-	$('#info-box').hide();
-
-	$(window).bind("beforeunload", function() { 
-		return $('#play_btn').hasClass(play_class) ? null : "Do you want to stop and exit?"; 
-	});
-
-	$('body').jplist({				
-		itemsBox: '#radio-list', 
-		itemPath: '.list_element',
-		panelPath: '.jplist-panel'	
-	});
-
-	$(window).bind('keydown', function(event) {
-		if (event.ctrlKey || event.metaKey) {
-			switch (String.fromCharCode(event.which).toLowerCase()) {
-				case 's':
-					event.preventDefault();
-					$('#radio-search').focus();
-					break;
-				case 'f':
-					event.preventDefault();
-					$('#radio-search').focus();
-					break;
+			var favorites;
+			if(!safari_ua) {
+				localStorage.getItem('favorites');
 			}
-		}
-	});
+			else {
+				$('#show_fav').hide();
+				console.log("Found this UA as Safari, So favorites should not work");
+			}
 
-	window.displayBoxIndex = -1;
+			if(!favorites){
+				favorites = {};
+			}
+			else {
+				favorites = JSON.parse(favorites);
+			}
 
-	$("body").keyup(function(e) 
-	{
-		if (e.keyCode == 40) 
-		{  
-			move_list(1);
-		}
-		else if(e.keyCode == 38)
-		{
-			move_list(-1);
-		}
-		else if(e.keyCode == 13){
-			last_fm_div.trigger('click');
-		}
+			//$('#sleep_input').slider();
+			var get_list = function(json) {
+				var sample_div = $('<div class="list_element">'
+					+ '<div class="art"><span class="glyphicon glyphicon-music" aria-hidden="true"></span></div>'
+					+ '<div class="details">'
+					+ '<label class="radio_name">AR Rahman</label><br/>'
+					+ '<p class="title">All time hits<p></div>'
+					+ '<span class="glyphicon glyphicon-star-empty right btn-icon favorite" aria-hidden="true"></span></div>'
+				);
+				sample_div.find('label').text(json.title);
+				sample_div.find('p').text(json.link);
+				sample_div.attr('data-link',json.mp3);
+				if(safari_ua) {
+					sample_div.find('.favorite').hide();
+				}
+				if(favorites[json.mp3]){
+					sample_div.find('.favorite').removeClass(de_fav_class).addClass(fav_class);
+					sample_div.addClass('favorite');
+				}
+				return sample_div;
+			};
 
-	});
+			function song_title() {
+				var selected_div = $('.list_element.selected');
+				if(selected_div.length < 1) {
+					return;
+				}
+				var current_url = selected_div.data('link');
+				var host = host_name(current_url);
+				if(host) {
+					var url = host + '/' + 'currentsong?sid=1';
+					$.getJSON('http://www.whateverorigin.org/get?url=' + encodeURIComponent(url) + '&callback=?', function(data){
+						var title = $('<div>').html(data.contents).text();
+						if(title.match(/403|404|found|forbidden/i)){
+							console.log(title, url);
+							return;
+						}
+						title = title.trim();
+						if(title) {
+							selected_div.find('p.title').html(title);
+						}
+					});
+				}
+				console.log('setting title');
+			};
 
-	function move_list(p) {
-		displayBoxIndex += p;
-		var oBoxCollection = $(".list_element");
-		if (displayBoxIndex >= oBoxCollection.length)
-			displayBoxIndex = 0;
-		if (displayBoxIndex < 0)
-			displayBoxIndex = oBoxCollection.length - 1;
-		var cssClass = "list_element_hover";
-		last_fm_div = oBoxCollection.removeClass(cssClass).eq(displayBoxIndex).addClass(cssClass);
-	};
+			var intervalID = setInterval(function(){
+				song_title();
+			}, 30000);
 
-	function host_name(link) {
-		if(!link) {
-			return 0;
-		}
-		if (link.indexOf("://") > -1) {
-			var parts = link.split('/');
-			return parts[0] + '/' + parts[1] + '/' + parts[2];
-		}
-		return 0;
-	};
+			var show_info = function(title,msg) {
+				var box = $('#info-box');
+				box.find('label').text(title);
+				box.find('p').text(msg);
+				box.show();
+			}
 
-	$('#radio-list').scroll(function(e){
-		var selected_div = $('.list_element.selected');
-		if(!selected_div.length) {
-			return;
-		}
-		var top = selected_div.position().top;
-		if (top < 42 && !selected_div.hasClass('list_element_fixed')) {
-			selected_div.addClass('list_element_fixed');
-		}
-		else if (top > 40 && selected_div.hasClass('list_element_fixed')) {
-			selected_div.removeClass('list_element_fixed');
-		}
-	});
-});
-//]]>
-</script>
+			var wait_sec = 0;
+			var retry_play = function() {
+				var sec = 0;
+				if(wait_sec == 0) {
+					sec = 2;
+				}
+				else {
+					sec = wait_sec * 2;
+				}
+				wait_sec = sec;
+				window.setTimeout(function() {
+					jp.jPlayer('clearMedia');
+					last_fm_div.trigger('click');
+				}, sec * 1000);
+				show_info('Streaming failed!', 'Trying in ' + sec + ' secs');
+			}
+
+			$(document).on($.jPlayer.event.waiting, function() {
+				show_info('Loading...',  '');
+			});
+
+			$(document).on($.jPlayer.event.playing, function() {
+				$('#info-box').hide();
+				$('#play_btn').removeClass(play_class);
+				$('#play_btn').addClass(stop_class);
+				wait_sec = 0;
+			});
+
+			$(document).on($.jPlayer.event.play, function() {
+				$('#info-box').hide();
+				$('#play_btn').removeClass(play_class);
+				$('#play_btn').addClass(stop_class);
+				wait_sec = 0;
+			});
+
+			$(document).on($.jPlayer.event.pause, function() {
+				$('#play_btn').addClass(play_class);
+				$('#play_btn').removeClass(stop_class);
+			});
+
+			$(document).on($.jPlayer.event.loadstart, function() {
+				console.log("Load started...");
+			});
+
+			// No use, since its trigered on each play.
+			//$(document).on($.jPlayer.event.suspend, function() {
+			//});
+
+			$(document).on($.jPlayer.event.ended, function() {
+				alert("Stream ended...!");
+			});
+
+			$(document).on($.jPlayer.event.stalled, function() {
+				console.log('Player stopped');
+			});
+
+			$(document).on($.jPlayer.event.error, function(a,b) {
+				console.log('Error...');
+				retry_play();
+			});
+
+			//$(document).on($.jPlayer.event.progress, function() {
+			//	show_info('Downloading...',  '');
+			//});
+
+			var jp = $("#jquery_jplayer_1").jPlayer({
+				swfPath: "https://cdnjs.cloudflare.com/ajax/libs/jplayer/2.9.2/jplayer/jquery.jplayer.swf",
+				supplied: "mp3, oga", 
+			});
+
+			var playing_div_top = 0;
+			$(document).on('click','.list_element', function() {
+				last_fm_div = $(this);
+				if(last_fm_div.hasClass('selected')) {
+					last_fm_div.removeClass('selected');
+					last_fm_div.removeClass('list_element_fixed');
+					jp.jPlayer('clearMedia');
+					return;
+				}
+				$('#radio-list div').removeClass('selected');
+				$('#radio-list div').removeClass('list_element_fixed');
+				last_fm_div.removeClass('list_element_fixed');
+				playing_div_top = last_fm_div.position().top;
+				var link = $(this).data('link');
+				last_fm_div.addClass('selected');
+				console.log(link);
+				jp.jPlayer('clearMedia');
+				jp.jPlayer('setMedia', { mp3: link });
+				jp.jPlayer('play');
+				song_title();
+			});
+
+			$('#play_btn').on('click', function() {
+				if($('#play_btn').hasClass(play_class)){
+					if(!last_fm_div){
+						last_fm_div = $('#radio-list').find('.list_element:visible:first');
+					} last_fm_div.trigger('click');
+				}
+				else {
+					$('#radio-list div').removeClass('selected');
+					$('#radio-list div').removeClass('list_element_fixed');
+					jp.jPlayer('clearMedia');
+					$('#play_btn').removeClass(stop_class);
+					$('#play_btn').addClass(play_class);
+				}
+			});
+
+			$(document).on('click','span.favorite', function(e) {
+				e.stopPropagation();
+				var sel = $(this);
+				var parent = sel.parent();
+				var link = parent.data('link');
+				if(sel.hasClass(de_fav_class)){
+					sel.removeClass(de_fav_class);
+					sel.addClass(fav_class);
+					parent.addClass('favorite');
+					favorites[link] = 1;
+				}
+				else {
+					sel.removeClass(fav_class);
+					sel.addClass(de_fav_class);
+					parent.removeClass('favorite');
+					delete favorites[link];
+				}
+				localStorage.setItem('favorites', JSON.stringify(favorites));
+			});
+
+			$('#show_fav').on('click',function(){
+				var btn = $(this);
+				var list = $('#radio-list');
+				if(btn.hasClass('show_fav')){
+					btn.removeClass('show_fav');
+					btn.removeClass(de_fav_class);
+					btn.addClass(fav_class);
+					list.find(".list_element:not(.favorite)").hide();
+				}
+				else {
+					btn.addClass('show_fav');
+					btn.removeClass(fav_class);
+					btn.addClass(de_fav_class);
+					list.find("div:not([class='favorite'])").show();
+				}
+			});
+
+			$('#toggle_view').on('click', function() {
+				if($('#radio-list div:first').hasClass('tile_view')) {
+					$('#radio-list div').removeClass('tile_view');
+					$(this).addClass(tile_view_class);
+					$(this).removeClass(list_view_class);
+				}
+				else {
+					$('#radio-list div').addClass('tile_view');
+					$(this).removeClass(tile_view_class);
+					$(this).addClass(list_view_class);
+				}
+			});
+
+			var radio_src = objMain['Channels'];
+			$.each(radio_src, function(name,link){
+				var temp = {
+					title: name,
+					mp3: link
+				};
+				var div = get_list(temp);
+				radio_list_div.append(div);
+			});
+
+			$('#info-box').hide();
+
+			$(window).bind("beforeunload", function() { 
+				return $('#play_btn').hasClass(play_class) ? null : "Do you want to stop and exit?"; 
+			});
+
+			$('body').jplist({				
+				itemsBox: '#radio-list', 
+				itemPath: '.list_element',
+				panelPath: '.jplist-panel'	
+			});
+
+			$(window).bind('keydown', function(event) {
+				if (event.ctrlKey || event.metaKey) {
+					switch (String.fromCharCode(event.which).toLowerCase()) {
+						case 's':
+							event.preventDefault();
+							$('#radio-search').focus();
+							break;
+						case 'f':
+							event.preventDefault();
+							$('#radio-search').focus();
+							break;
+					}
+				}
+			});
+
+			window.displayBoxIndex = -1;
+
+			$("body").keyup(function(e) 
+			{
+				if (e.keyCode == 40) 
+				{  
+					move_list(1);
+				}
+				else if(e.keyCode == 38)
+				{
+					move_list(-1);
+				}
+				else if(e.keyCode == 13){
+					last_fm_div.trigger('click');
+				}
+
+			});
+
+			function move_list(p) {
+				displayBoxIndex += p;
+				var oBoxCollection = $(".list_element");
+				if (displayBoxIndex >= oBoxCollection.length)
+					displayBoxIndex = 0;
+				if (displayBoxIndex < 0)
+					displayBoxIndex = oBoxCollection.length - 1;
+				var cssClass = "list_element_hover";
+				last_fm_div = oBoxCollection.removeClass(cssClass).eq(displayBoxIndex).addClass(cssClass);
+			};
+
+			function host_name(link) {
+				if(!link) {
+					return 0;
+				}
+				if (link.indexOf("://") > -1) {
+					var parts = link.split('/');
+					return parts[0] + '/' + parts[1] + '/' + parts[2];
+				}
+				return 0;
+			};
+
+			$('#radio-list').scroll(function(e){
+				var selected_div = $('.list_element.selected');
+				if(!selected_div.length) {
+					return;
+				}
+				var top = selected_div.position().top;
+				if (top < 42 && !selected_div.hasClass('list_element_fixed')) {
+					selected_div.addClass('list_element_fixed');
+				}
+				else if (top > 40 && selected_div.hasClass('list_element_fixed')) {
+					selected_div.removeClass('list_element_fixed');
+				}
+			});
+		});
+		//]]>
+	</script>
 	<style>
 		.list_element {
 			border-bottom: 1px solid grey;
@@ -537,14 +539,6 @@ $(document).ready(function(){
 			width: 100%;
 			z-index: 100;
 		}
-		p.title object {
-			margin-top: -8px;
-			margin-left: -4px;
-			z-index: -1;
-		};
-		pre {
-			color: white;
-		}
 	</style>
 </head>
 <body>
@@ -558,19 +552,19 @@ $(document).ready(function(){
 		<!-- filter by title -->
 		<button id="share-photo" class="hide glyphicon glyphicon-share-alt right inactive" aria-hidden="true"></button>
 		<div class="right search-bar">
-		<div class="text-filter-box jplist-panel">
-			<input id="radio-search" data-path=".radio_name" 
-			type="text" 
-			class="jplist-no-right-border"
-			placeholder="Search (Ctrl + S)" 
-			data-control-type="textbox" 
-			data-control-name="title-filter" 
-			data-control-action="filter"
-			/>
+			<div class="text-filter-box jplist-panel">
+				<input id="radio-search" data-path=".radio_name" 
+				type="text" 
+				class="jplist-no-right-border"
+				placeholder="Search (Ctrl + S)" 
+				data-control-type="textbox" 
+				data-control-name="title-filter" 
+				data-control-action="filter"
+				/>
 
-			<!-- clear textbox button -->
-			<i class="fa fa-times-circle jplist-clear" data-type="clear"></i>
-		</div>
+				<!-- clear textbox button -->
+				<i class="fa fa-times-circle jplist-clear" data-type="clear"></i>
+			</div>
 		</div>
 	</div>
 	<div id="radio-list"></div>
