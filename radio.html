@@ -210,13 +210,14 @@ redirect_from: "/radio/"
 				last_fm_div = $(this);
 				if(last_fm_div.hasClass('selected')) {
 					last_fm_div.removeClass('selected');
-					last_fm_div.removeClass('list_element_fixed');
+					last_fm_div.removeClass('list_element_fixed_top');
+					last_fm_div.removeClass('list_element_fixed_bottom');
 					jp.jPlayer('clearMedia');
 					return;
 				}
 				$('#radio-list div').removeClass('selected');
-				$('#radio-list div').removeClass('list_element_fixed');
-				last_fm_div.removeClass('list_element_fixed');
+				$('#radio-list div').removeClass('list_element_fixed_top');
+				$('#radio-list div').removeClass('list_element_fixed_bottom');
 				playing_div_top = last_fm_div.position().top;
 				var link = $(this).data('link');
 				last_fm_div.addClass('selected');
@@ -235,7 +236,8 @@ redirect_from: "/radio/"
 				}
 				else {
 					$('#radio-list div').removeClass('selected');
-					$('#radio-list div').removeClass('list_element_fixed');
+					$('#radio-list div').removeClass('list_element_fixed_top');
+					$('#radio-list div').removeClass('list_element_fixed_bottom');
 					jp.jPlayer('clearMedia');
 					$('#play_btn').removeClass(stop_class);
 					$('#play_btn').addClass(play_class);
@@ -375,11 +377,19 @@ redirect_from: "/radio/"
 					return;
 				}
 				var top = selected_div.position().top;
-				if (top < 42 && !selected_div.hasClass('list_element_fixed')) {
-					selected_div.addClass('list_element_fixed');
+				var bot_pos = $('#player').position().top;
+				var next_div_top = selected_div.next().position().top;
+				if (top < 42 && !selected_div.hasClass('list_element_fixed_top')) {
+					selected_div.addClass('list_element_fixed_top');
 				}
-				else if (top > 40 && selected_div.hasClass('list_element_fixed')) {
-					selected_div.removeClass('list_element_fixed');
+				else if (next_div_top > 40 && selected_div.hasClass('list_element_fixed_top')) {
+					selected_div.removeClass('list_element_fixed_top');
+				}
+				else if((bot_pos - top) < 52 && !selected_div.hasClass('list_element_fixed_bottom')){
+					selected_div.addClass('list_element_fixed_bottom');
+				}
+				else if((next_div_top + 52) < bot_pos && selected_div.hasClass('list_element_fixed_bottom')){
+					selected_div.removeClass('list_element_fixed_bottom');
 				}
 			});
 		});
@@ -401,6 +411,14 @@ redirect_from: "/radio/"
 		.list_element p {
 			margin-top: 1px;
 			font-size: 10px;
+			width: 100%;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			display: -webkit-box;
+			-webkit-box-orient: vertical;
+			-webkit-line-clamp: 2; /* number of lines to show */
+			line-height: 10px;        /* fallback */
+			max-height: 20px;  
 		}
 		.list_element .art {
 			height: 35px;
@@ -533,11 +551,22 @@ redirect_from: "/radio/"
 			background:#3b5998;
 			color:#FFFFFF;
 		}
-		.list_element_fixed {
+		.list_element_fixed_top {
 			position: fixed;
 			top: 40px;
 			width: 100%;
 			z-index: 100;
+			background: #59a05a;
+			color: #fff;
+		}
+		.list_element_fixed_bottom {
+			position: fixed;
+			bottom: 48px;
+			width: 100%;
+			z-index: 100;
+			background: #59a05a;
+			color: #fff;
+			box-shadow: 3px 0px 12px #666;
 		}
 	</style>
 </head>
