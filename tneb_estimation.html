@@ -1,0 +1,306 @@
+---
+redirect_from: "/tneb/"
+---
+<html>
+	<head>
+		<title>TNEB Estimation</title>
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+		<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+	</head>
+	<script>
+
+		Date.prototype.addDays = function(days) {
+			var date = new Date(this.valueOf());
+			date.setDate(date.getDate() + days);
+			return date;
+		}
+
+		var data = window.localStorage.getItem("_eb_bill_data");
+
+		if(data) {
+			data = JSON.parse(data);
+			console.log("Data loaded", data);
+		}
+		
+		$(document).ready(function(){
+			if(!data.hasOwnProperty('bill')) {
+				$('#bill-add-btn').trigger('click');
+			}
+
+			if(!data.hasOwnProperty('usage')) {
+				data['usage'] = {};
+			}
+
+			$('#md-add').click(function() {
+				add_bill();
+			});
+
+			$('#usg-add-btn').click(function() {
+				add_usage();
+			});
+
+			$('#read-add-btn').click(function() {
+				add_current_reading();
+			});
+
+			refresh_usage();
+
+		});
+
+		//window.localStorage.setItem("_eb_bill_data", JSON.stringify({}));
+
+		function finalize() {
+			console.log(data);
+			window.localStorage.setItem("_eb_bill_data", JSON.stringify(data));
+		}
+
+		function add_bill() {
+			var bill_read = $('#bill_reading').val();
+			var bill_date = $('#bill_date').val();
+			
+			if(!data.hasOwnProperty('bill')) {
+				data['bill'] = {};
+			}
+			data['bill'][bill_read] = bill_date;
+			$('#bill-add').modal('toggle');
+			finalize();
+		}
+
+		function add_usage() {
+			var read = $('#usg_reading').val();
+			var date = $('#usg_date').val();
+
+			data['usage'][read] = date;
+			$('#usg-add').modal('toggle');
+			finalize();
+			refresh_usage();
+		}
+
+		function add_current_reading() {
+			let cur_reading = $('#current_reading').val();
+
+			if(!cur_reading) {
+				alert("Plase enter valid reading from meter");
+				return;
+			}
+
+			data['usage'][cur_reading] = new Date().toJSON().slice(0, 10);
+			finalize();
+			refresh_usage();
+		}
+
+		function last_bill() {
+			let bills = Object.keys(data['bill']);
+			let last = bills.sort((a,b)=>a-b).reverse()[0];
+			return [last, data['bill'][last]];
+		}
+
+		function refresh_usage() {
+			let [bill_read, bill_date] = last_bill();
+			let usage = data['usage'];
+			let reads = Object.keys(usage);
+
+			reads = reads.sort((a,b)=>a-b);
+
+			$('#usg-data').html('');
+
+			let last_read = bill_read;
+			let last_date = bill_date;
+			let avg_usg = 0;
+			let total_usg = 0;
+			let cnt = 0;
+			add_usage_row(last_date, last_read, total_usg, total_usg);
+			reads.forEach((read, i) => {
+
+				if(read < last_read) {
+					return;
+				}
+
+				console.log(i, read);
+				let usg = read - last_read;
+				let date = usage[read];
+				let days = diff_days(date, last_date);
+				add_usage_row(date, read, usg, days);
+				last_read = read;
+				last_date = date;
+				avg_usg += usg / days;
+				total_usg += usg;
+				cnt++;
+			});
+
+			avg_usg = parseInt(avg_usg / cnt);
+			$('#avg_pd').text(avg_usg);
+			$('#usg_td').text(total_usg);
+
+			let est_bill_date = new Date(bill_date).addDays(60);
+			let est_days_left = diff_days(last_date, est_bill_date);
+			let est_total_units = parseInt(est_days_left * avg_usg) + total_usg;
+			$('#usg_ebd').text(est_total_units);
+			$('#est_bill_amt').text(calculateEB(est_total_units));
+		}
+
+		function add_usage_row(d, rd, usg, days) {
+			let c1 = $('<td>').text(d);
+			let c2 = $('<td>').text(rd);
+			let c3 = $('<td>').text(usg + '/' + days);
+			let c4 = $('<td>').text(parseInt(usg/days));
+			let r = $('<tr>').append(c1, c2, c3, c4);
+			$('#usg-data').append(r);
+		}
+
+		function diff_days(d1, d2) {
+			const date1 = new Date(d1);
+			const date2 = new Date(d2);
+			const diffTime = Math.abs(date2 - date1);
+			const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+			return diffDays
+		}
+
+
+		function calculateEB(ebUnits) {
+			var ebAmount = 0;
+			var tariff = 0;
+			if (ebUnits > 0 && ebUnits <= 100) {
+				ebAmount = ebUnits * 2.25;
+				tariff = 0;
+			} else if (ebUnits <= 200) {
+				ebAmount = (ebUnits - 100) * 2.25;
+				tariff = ebAmount;
+			} else if (ebUnits <= 400) {
+				ebAmount = 225 + ((ebUnits - 200) * 4.5);
+				tariff = ebAmount;
+			} else if (ebUnits <= 500) {
+				ebAmount = 1125 + ((ebUnits - 400) * 6);
+				tariff = ebAmount;
+			} else if (ebUnits <= 600) {
+				ebAmount = 1950 + ((ebUnits - 500) * 8);
+				tariff = ebAmount;
+			} else if (ebUnits <= 800) {
+				ebAmount = 2750 + ((ebUnits - 600) * 9);
+				tariff = ebAmount;
+			} else if (ebUnits <= 1000) {
+				ebAmount = 4550 + ((ebUnits - 800) * 10);
+				tariff = ebAmount;
+			} else if (ebUnits > 1000) {
+				ebAmount = 6550 + ((ebUnits - 1000) * 11);
+				tariff = ebAmount;
+			} else {
+				tariff = 0;
+			}
+
+			return ebAmount;
+		}
+
+	</script>
+	<body>
+		<div class="container">
+			<div class="mb-3">
+				TNEB Daily monitoring and Bill Estimation calculator
+			</div>
+			<div class="mb-3">
+				</br>
+				<label>Enter Current Reading from Meter</label>
+				<input type="number" class="form-control" id="current_reading" placeholder="Enter Reading">
+			</div>
+			<div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+				<div style="margin-right: 2px;" class="btn-group mr-2" role="group" aria-label="First group">
+					<button id="bill-add-btn" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#bill-add">New Bill</button>
+				</div>
+				<div style="margin-right: 2px;" class="btn-group mr-2" role="group" aria-label="First group">
+					<button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#usg-add">Other Date</button>
+				</div>
+				<div class="btn-group mr-2" role="group" aria-label="Second group">
+					<button id="read-add-btn" class="btn btn-primary">Add</button>
+				</div>
+			</div>
+
+			<hr/>
+
+			<div class="mb-3">
+				<h3>Usage Statistics</h3>
+				<table class="table">
+					<tr>
+						<th>Average Usage per day</th>
+						<td><span id="avg_pd"></span></td>
+					</tr>
+					<tr>
+						<th>Unit consumed till date</th>
+						<td><span id="usg_td"></span></td>
+					</tr>
+					<tr>
+						<th>Estimated Units till next bill</th>
+						<td><span id="usg_ebd"></span></td>
+					</tr>
+					<tr>
+						<th>Estimated Bill Amount</th>
+						<td><span id="est_bill_amt"></span></td>
+					</tr>
+				</table>
+			</div>
+
+			<hr/>
+
+			<div class="mb-3">
+				<h3>Usage History</h3>
+				<table class="table">
+					<thead>
+						<tr>
+							<th>Date</th>
+							<th>Reading</th>
+							<th>Usage/Days</th>
+							<th>Avg. pDay</th>
+						</tr>
+					</thead>
+					<tbody id="usg-data">
+					</tbody>
+				</table>
+			</div>
+		</div>
+
+		<div class="modal" tabindex="-1" id="bill-add">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title">Add Your latest EB Bill info</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+						<label for="bill_reading">Enter Last Billed Reading</label>
+						<input type="number" class="form-control" id="bill_reading" placeholder="Enter Reading">
+						<br/>
+						<label for="bill_date">Choose Reading Taken Date</label>
+						<input type="date" class="form-control" id="bill_date" placeholder="Enter Date">
+					</div>
+					<div class="modal-footer">
+						<button id="md-close" type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+						<button id="md-add" type="button" class="btn btn-primary">Add</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="modal" tabindex="-1" id="usg-add">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title">Add Usage</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+						<label for="usg_reading">Reading</label>
+						<input type="number" class="form-control" id="usg_reading" placeholder="Enter Reading">
+						<br/>
+						<label for="usg_date">Date</label>
+						<input type="date" class="form-control" id="usg_date" placeholder="Enter Date">
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+						<button id="usg-add-btn" type="button" class="btn btn-primary">Add</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</body>
+</html>
