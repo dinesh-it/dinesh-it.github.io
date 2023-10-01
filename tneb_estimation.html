@@ -81,6 +81,13 @@ redirect_from: "/tneb/"
 				refresh_usage();
 			});
 
+			$(document).on('click', '.read_delete', function(e) {
+				let read = $(this).data('read');
+				delete data['usage'][read];
+				finalize();
+				refresh_usage();
+			});
+
 			refresh_usage();
 		});
 
@@ -229,7 +236,8 @@ redirect_from: "/tneb/"
 			let c2 = $('<td>').text(rd);
 			let c3 = $('<td>').text(usg + '/' + days);
 			let c4 = $('<td>').text(avg);
-			let r = $('<tr>').append(c1, c2, c3, c4);
+			let c5 = $('<td>').html($('<button>').data('read', rd).addClass('read_delete btn btn-sm btn-danger').text('x'));
+			let r = $('<tr>').append(c1, c2, c3, c4, c5);
 			$('#usg-data').append(r);
 		}
 
