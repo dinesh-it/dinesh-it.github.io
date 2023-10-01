@@ -22,27 +22,39 @@ redirect_from: "/tneb/"
 			return date;
 		}
 
-		var data = window.localStorage.getItem("_eb_bill_data");
+		var db_data = window.localStorage.getItem("_eb_bill_data");
+		var data = {};
 
-		if(data) {
-			data = JSON.parse(data);
-			console.log("Data loaded", data);
+		if(db_data) {
+			db_data = JSON.parse(db_data);
+
+			if(db_data.hasOwnProperty('bill')) {
+				db_data = {
+					'My Home': db_data
+				};
+			}
 		}
 		else {
-			data = {
-				bill: {},
-				usage: {}
+			db_data = {
+				'My Home': {
+					bill: {},
+					usage: {}
+				}
 			};
 		}
-		
+
 		$(document).ready(function(){
-			if(!data.hasOwnProperty('bill')) {
-				$('#bill-add-btn').trigger('click');
-			}
+
+			load_meters();
+
+			let selected_meter = $('#meter_name').val();
+			data = db_data[selected_meter];
 
 			if(!data.hasOwnProperty('usage')) {
 				data['usage'] = {};
 			}
+
+			$('#usg_date').val(new Date().toJSON().slice(0, 10));
 
 			$('#md-add').click(function() {
 				add_bill();
@@ -52,36 +64,86 @@ redirect_from: "/tneb/"
 				add_usage();
 			});
 
-			$('#read-add-btn').click(function() {
-				add_current_reading();
+			$('#meter-add').click(function() {
+				let mn = $('#new_meter_name').val();
+				db_data[mn] = {
+					bill: {},
+					usage: {}
+				};
+				load_meters();
+				$('#meter-add-modal').modal('toggle');
+				finalize();
+			});
+
+			$('#meter_name').change(function() {
+				let selected_meter = $('#meter_name').val();
+				data = db_data[selected_meter];
+				refresh_usage();
 			});
 
 			refresh_usage();
-
 		});
 
-		//window.localStorage.setItem("_eb_bill_data", JSON.stringify({}));
-
 		function finalize() {
-			console.log(data);
-			window.localStorage.setItem("_eb_bill_data", JSON.stringify(data));
+			let selected_meter = $('#meter_name').val();
+			db_data[selected_meter] = data;
+			window.localStorage.setItem("_eb_bill_data", JSON.stringify(db_data));
+			reset_fields();
+		}
+
+		function load_meters() {
+			let meters = Object.keys(db_data);
+			meters.forEach((v, i) => {
+				let opt = $('<option>').val(v).text(v);
+				$('#meter_name').append(opt);
+			});
 		}
 
 		function add_bill() {
 			var bill_read = $('#bill_reading').val();
+
+			if(!bill_read) {
+				alert("Plase enter valid meter reading");
+				return;
+			}
+
 			var bill_date = $('#bill_date').val();
-			
+
+			if(!bill_date) {
+				alert("Plase enter valid bill date");
+				return;
+			}
+
 			if(!data.hasOwnProperty('bill')) {
 				data['bill'] = {};
 			}
 			data['bill'][bill_read] = bill_date;
 			$('#bill-add').modal('toggle');
 			finalize();
+			refresh_usage();
 		}
 
 		function add_usage() {
+			let [b_read, b_date] = last_bill();
+
+			if(!b_read) {
+				alert('Please click on "New Bill" button and add your last bill before adding current reading');
+				reset_fields();
+				return;
+			}
 			var read = $('#usg_reading').val();
+
+			if(!read) {
+				alert("Plase enter valid meter reading");
+				return;
+			}
+
 			var date = $('#usg_date').val();
+
+			if(!date) {
+				alert("Plase enter valid reading date");
+				return;
+			}
 
 			data['usage'][read] = date;
 			$('#usg-add').modal('toggle');
@@ -89,17 +151,11 @@ redirect_from: "/tneb/"
 			refresh_usage();
 		}
 
-		function add_current_reading() {
-			let cur_reading = $('#current_reading').val();
-
-			if(!cur_reading) {
-				alert("Plase enter valid reading from meter");
-				return;
-			}
-
-			data['usage'][cur_reading] = new Date().toJSON().slice(0, 10);
-			finalize();
-			refresh_usage();
+		function reset_fields() {
+			$('#new_meter_name').val('');
+			$('#bill_reading').val('');
+			$('#bill_date').val('');
+			$('#usg_reading').val('');
 		}
 
 		function last_bill() {
@@ -109,6 +165,8 @@ redirect_from: "/tneb/"
 		}
 
 		function refresh_usage() {
+			let selected_meter = $('#meter_name').val();
+			data = db_data[selected_meter];
 			let [bill_read, bill_date] = last_bill();
 			let usage = data['usage'];
 			let reads = Object.keys(usage);
@@ -141,9 +199,19 @@ redirect_from: "/tneb/"
 				cnt++;
 			});
 
-			avg_usg = parseInt(avg_usg / cnt);
+			if(avg_usg && cnt) {
+				avg_usg = parseInt(avg_usg / cnt);
+			}
+			else {
+				avg_usg = '-';
+			}
+
 			$('#avg_pd').text(avg_usg);
 			$('#usg_td').text(total_usg);
+
+			if(!last_date) {
+				return;
+			}
 
 			let est_bill_date = new Date(bill_date).addDays(60);
 			let est_days_left = diff_days(last_date, est_bill_date);
@@ -153,10 +221,14 @@ redirect_from: "/tneb/"
 		}
 
 		function add_usage_row(d, rd, usg, days) {
+			let avg = '-';
+			if(usg && days) {
+				avg = parseInt(usg/days);
+			}
 			let c1 = $('<td>').text(d);
 			let c2 = $('<td>').text(rd);
 			let c3 = $('<td>').text(usg + '/' + days);
-			let c4 = $('<td>').text(parseInt(usg/days));
+			let c4 = $('<td>').text(avg);
 			let r = $('<tr>').append(c1, c2, c3, c4);
 			$('#usg-data').append(r);
 		}
@@ -168,7 +240,6 @@ redirect_from: "/tneb/"
 			const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
 			return diffDays
 		}
-
 
 		function calculate_eb_amount(ebUnits) {
 			var ebAmount = 0;
@@ -205,29 +276,40 @@ redirect_from: "/tneb/"
 		}
 
 	</script>
+	<style>
+		option {
+			background-color: color;
+			border-radius: value;
+			font-size: value;
+		}
+	</style>
 	<body>
+
+		<nav class="navbar navbar-dark bg-dark">
+			<span class="navbar-text">TNEB Bill Estimation and Daily Monitor</span>
+		</nav>
+
+		<div style="height: 2px;"></div>
+
 		<div class="container">
 			<div class="mb-3">
-				<h3>TNEB Daily monitoring and Bill Estimation calculator</h3>
-			</div>
-			<div class="mb-3">
+				<label>Select Meter: </label>
+				<select id="meter_name">
+				</select>
+				<button id="meter-add-btn" class="btn btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#meter-add-modal">New Meter</button>
+				<button id="bill-add-btn" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#bill-add">New Bill</button>
 				</br>
-				<label>Enter Current Reading from Meter</label>
-				<input type="number" class="form-control" id="current_reading" placeholder="Enter Reading">
-			</div>
-			<div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
-				<div style="margin-right: 2px;" class="btn-group mr-2" role="group" aria-label="First group">
-					<button id="bill-add-btn" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#bill-add">New Bill</button>
-				</div>
-				<div style="margin-right: 2px;" class="btn-group mr-2" role="group" aria-label="First group">
-					<button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#usg-add">Other Date</button>
-				</div>
-				<div class="btn-group mr-2" role="group" aria-label="Second group">
-					<button id="read-add-btn" class="btn btn-primary">Add</button>
-				</div>
-			</div>
+				<label>Enter Reading from Meter</label>
 
-			<hr/>
+				<div class="input-group">
+					<input type="number" class="form-control input-sm" id="usg_reading" placeholder="Enter Reading">
+					<!-- reducong the gap between them to zero -->
+					<span class="input-group-btn" style="width:2px;"></span>
+					<input type="date" class="form-control input-sm" id="usg_date" placeholder="Date">
+					<button id="usg-add-btn" class="btn btn-primary">Add</button>
+				</div>
+
+			</div>
 
 			<div class="mb-3">
 				<h3>Usage Statistics</h3>
@@ -268,10 +350,11 @@ redirect_from: "/tneb/"
 					</tbody>
 				</table>
 			</div>
-		</div>
 
-		<div class="mb-3">
-			<p>Click on "New Bill" button to add latest bill information (Reading and Date) from you last bill from TNEB Card or from TNEB Portal. Once your last bill is added you can keep on add your current reading by taking current read from meter every day or once in a week and the app can show you the Bill estimation for this billing cycle and you also keep track and see the usage trend in your house. Currently This app supports only for TNEB Domestic Consumer meters.</p>
+			<div class="mb-3">
+				<p>Click on "New Bill" button to add latest bill information (Reading and Date) from you last bill from TNEB Card or from TNEB Portal. Once your last bill is added you can keep on add your current reading by taking current read from meter every day or once in a week and the app can show you the Bill estimation for this billing cycle and you also keep track and see the usage trend in your house. Currently This app supports only for TNEB Domestic Consumer meters.</p>
+			</div>
+
 		</div>
 
 		<div class="modal" tabindex="-1" id="bill-add">
@@ -296,23 +379,21 @@ redirect_from: "/tneb/"
 			</div>
 		</div>
 
-		<div class="modal" tabindex="-1" id="usg-add">
+		<div class="modal" tabindex="-1" id="meter-add-modal">
 			<div class="modal-dialog">
 				<div class="modal-content">
 					<div class="modal-header">
-						<h5 class="modal-title">Add Usage</h5>
+						<h5 class="modal-title">Add New Meter</h5>
 						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 					</div>
 					<div class="modal-body">
-						<label for="usg_reading">Reading</label>
-						<input type="number" class="form-control" id="usg_reading" placeholder="Enter Reading">
+						<label for="new_meter_name">Enter a Name for Meter</label>
+						<input type="text" class="form-control" id="new_meter_name" placeholder="My Home">
 						<br/>
-						<label for="usg_date">Date</label>
-						<input type="date" class="form-control" id="usg_date" placeholder="Enter Date">
 					</div>
 					<div class="modal-footer">
 						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-						<button id="usg-add-btn" type="button" class="btn btn-primary">Add</button>
+						<button id="meter-add" type="button" class="btn btn-primary">Add</button>
 					</div>
 				</div>
 			</div>
