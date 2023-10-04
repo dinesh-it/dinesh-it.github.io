@@ -5,7 +5,16 @@ redirect_from: "/tneb/"
 	<head>
 
 		<title>TNEB Bill Estimation Calculator</title>
+
 		<link rel="icon" type="image/x-icon" href="/images/tneb_logo.ico">
+
+		<link href="/images/tneb_logo.png" rel="apple-touch-icon" />
+		<link href="/images/tneb_logo.png" rel="apple-touch-icon" sizes="152x152" />
+		<link href="/images/tneb_logo.png" rel="apple-touch-icon" sizes="167x167" />
+		<link href="/images/tneb_logo.png" rel="apple-touch-icon" sizes="180x180" />
+		<link href="/images/tneb_logo.png" rel="icon" sizes="192x192" />
+		<link href="/images/tneb_logo.png" rel="icon" sizes="128x128" />
+
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 		<meta name="title" property="og:title" content="TNEB Bill Estimation Calculator">
 		<meta name="description" property="og:description" content="Simple app to track and calculate your TNEB electricity consumption and bill estimation">
@@ -207,13 +216,12 @@ redirect_from: "/tneb/"
 			let usage = data['usage'];
 			let reads = Object.keys(usage);
 
+			reads = reads.sort((a,b)=>a-b);
+
 			$('#usg_history').dataTable().fnDestroy();
 			$('#usg_history').dataTable({
 				"order": [[0,'desc']],
 			});
-
-			reads = reads.sort((a,b)=>a-b);
-
 
 			$('#avg_pd').text('-');
 			$('#usg_td').text('-');
@@ -290,8 +298,9 @@ redirect_from: "/tneb/"
 			let c1 = $('<td>').text(d);
 			let c2 = $('<td>').text(rd);
 			let c3 = $('<td>').text(usg + '/' + days);
-			let c4 = $('<td>').html(avg).append("<span>&nbsp;&nbsp;&nbsp;</span>").append($('<button>').data('read', rd).addClass('read_delete btn btn-sm btn-danger').text('x'));
-			let r = $('<tr>').append(c1, c2, c3, c4);
+			let c4 = $('<td>').text(avg);
+			let c5 = $('<td>').html($('<button>').data('read', rd).addClass('read_delete btn btn-sm btn-danger').text('x'));
+			let r = $('<tr>').append(c1, c2, c3, c4, c5);
 			$('#usg-data').append(r);
 		}
 
@@ -419,8 +428,9 @@ redirect_from: "/tneb/"
 						<tr>
 							<th>Date</th>
 							<th>Reading</th>
-							<th>Usage/Days</th>
-							<th>Avg. pDay</th>
+							<th>Units/<br>Days</th>
+							<th>Avg.<br>pDay</th>
+							<th></th>
 						</tr>
 					</thead>
 					<tbody id="usg-data">
