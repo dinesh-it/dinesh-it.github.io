@@ -210,6 +210,24 @@ redirect_from: "/tneb/"
 		}
 
 		function refresh_usage() {
+			let rows = get_rows();
+
+			$('#usg_history').dataTable({
+				"data": rows,
+				"destroy": true,
+				"responsive": true,
+				"order": [[0,'desc']],
+				"searching": false,
+				"paging": false,
+				"info": false,
+				"fnCreatedRow": function( nRow, aData, iDataIndex ) {
+					let c5 = $('<button>').data('read', aData[1]).addClass('read_delete btn btn-sm btn-danger').text('x');
+					$('td:eq(4)', nRow).append(c5);
+				},
+			});
+		}
+
+		function get_rows() {
 			let selected_meter = $('#meter_name').val();
 			data = db_data[selected_meter];
 			let [bill_read, bill_date] = last_bill();
@@ -217,11 +235,6 @@ redirect_from: "/tneb/"
 			let reads = Object.keys(usage);
 
 			reads = reads.sort((a,b)=>a-b);
-
-			$('#usg_history').dataTable().fnDestroy();
-			$('#usg_history').dataTable({
-				"order": [[0,'desc']],
-			});
 
 			$('#avg_pd').text('-');
 			$('#usg_td').text('-');
@@ -239,25 +252,25 @@ redirect_from: "/tneb/"
 			let total_usg = 0;
 			let cnt = 0;
 
+			let rows = [];
+
 			if(!last_read) {
-				table.row.add();
-				return;
+				return rows;
 			}
 
-			$('#usg-data').html('');
 
-			add_usage_row(last_date, last_read, total_usg, total_usg);
+			rows.push(add_usage_row(last_date, last_read, total_usg, total_usg));
+
 			reads.forEach((read, i) => {
 
 				if(read < last_read) {
 					return;
 				}
 
-				console.log(i, read);
 				let usg = read - last_read;
 				let date = usage[read];
 				let days = diff_days(date, last_date);
-				add_usage_row(date, read, usg, days);
+				rows.push(add_usage_row(date, read, usg, days));
 				last_read = read;
 				last_date = date;
 				avg_usg += usg / days;
@@ -278,7 +291,7 @@ redirect_from: "/tneb/"
 			$('#last_usg_date').text(new Date(last_date).toJSON().slice(0, 10));
 
 			if(cnt < 1) {
-				return;
+				return rows;
 			}
 
 			let est_bill_date = new Date(bill_date).addDays(62);
@@ -288,6 +301,8 @@ redirect_from: "/tneb/"
 			$('#est_bill_date').text(new Date(est_bill_date).toJSON().slice(0, 10));
 			$('#usg_ebd').text(est_total_units);
 			$('#est_bill_amt').text(INR.format(calculate_eb_amount(est_total_units)));
+
+			return rows;
 		}
 
 		function add_usage_row(d, rd, usg, days) {
@@ -295,13 +310,7 @@ redirect_from: "/tneb/"
 			if(usg && days) {
 				avg = parseInt(usg/days);
 			}
-			let c1 = $('<td>').text(d);
-			let c2 = $('<td>').text(rd);
-			let c3 = $('<td>').text(usg + '/' + days);
-			let c4 = $('<td>').text(avg);
-			let c5 = $('<td>').html($('<button>').data('read', rd).addClass('read_delete btn btn-sm btn-danger').text('x'));
-			let r = $('<tr>').append(c1, c2, c3, c4, c5);
-			$('#usg-data').append(r);
+			return [d, rd, usg + '/' + days, avg, ''];
 		}
 
 		function diff_days(d1, d2) {
