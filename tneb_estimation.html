@@ -290,9 +290,8 @@ redirect_from: "/tneb/"
 			let c1 = $('<td>').text(d);
 			let c2 = $('<td>').text(rd);
 			let c3 = $('<td>').text(usg + '/' + days);
-			let c4 = $('<td>').text(avg);
-			let c5 = $('<td>').html($('<button>').data('read', rd).addClass('read_delete btn btn-sm btn-danger').text('x'));
-			let r = $('<tr>').append(c1, c2, c3, c4, c5);
+			let c4 = $('<td>').html(avg).append("<span>&nbsp;&nbsp;&nbsp;</span>").append($('<button>').data('read', rd).addClass('read_delete btn btn-sm btn-danger').text('x'));
+			let r = $('<tr>').append(c1, c2, c3, c4);
 			$('#usg-data').append(r);
 		}
 
