@@ -267,6 +267,7 @@ redirect_from: "/tneb/"
 
 			rows.push(add_usage_row(last_date, last_read, total_usg, total_usg));
 
+			let last_3 = [];
 			reads.forEach((read, i) => {
 
 				if(read < last_read) {
@@ -279,29 +280,26 @@ redirect_from: "/tneb/"
 				rows.push(add_usage_row(date, read, usg, days));
 				last_read = read;
 				last_date = date;
-				avg_usg += usg / days;
+				let _avg = usg / days;
+				avg_usg += _avg;
+				last_3.push(_avg);
+				if(last_3.length > 3) {
+					last_3.shift();
+				}
 				total_usg += usg;
 				cnt++;
 			});
 
 			if(avg_usg && cnt) {
 				avg_usg = parseInt(avg_usg / cnt);
-				let c = 0;
-				let au = 0;
-				let u = 0;
-				let pr = parseInt(reads.pop());
-				while(reads) {
-					u = pr - parseInt(reads.pop());
-					c++;
-					au = u / c;
-					if(c > 3) {
-						break;
-					}
-					console.log(au, c, u);
-				}
-
+				const sum = last_3.reduce((a, b) => a + b, 0);
+				const au = (sum / last_3.length) || 0;
 				if(au > avg_usg) {
 					avg_usg = au;
+					$('#usg_days').text("last " + last_3.length);
+				}
+				else {
+					$('#usg_days').text(cnt);
 				}
 			}
 			else {
@@ -310,7 +308,6 @@ redirect_from: "/tneb/"
 
 			$('#avg_pd').text(avg_usg);
 			$('#usg_td').text(total_usg);
-			$('#usg_days').text(cnt);
 			$('#last_usg_date').text(new Date(last_date).toJSON().slice(0, 10));
 
 			if(cnt < 1) {
