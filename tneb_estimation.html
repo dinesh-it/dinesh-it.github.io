@@ -110,6 +110,12 @@ redirect_from: "/tneb/"
 				refresh_usage();
 			});
 
+			$('#units-cons').on('change keyup', function() {
+				var units = $(this).val();
+				var amt = calculate_eb_amount(units);
+				$('#est-bill-amt').text(INR.format(amt));
+			});
+
 			$(document).on('click', '.read_delete', function(e) {
 				let read = $(this).data('read');
 				let msg = "Are you sure, you want to delete reading " + read + " ?";
@@ -261,6 +267,7 @@ redirect_from: "/tneb/"
 
 			rows.push(add_usage_row(last_date, last_read, total_usg, total_usg));
 
+			let last_3 = [];
 			reads.forEach((read, i) => {
 
 				if(read < last_read) {
@@ -273,13 +280,28 @@ redirect_from: "/tneb/"
 				rows.push(add_usage_row(date, read, usg, days));
 				last_read = read;
 				last_date = date;
-				avg_usg += usg / days;
+				let _avg = usg / days;
+				avg_usg += _avg;
+				last_3.push(_avg);
+				if(last_3.length > 3) {
+					last_3.shift();
+				}
 				total_usg += usg;
 				cnt++;
 			});
 
 			if(avg_usg && cnt) {
 				avg_usg = parseInt(avg_usg / cnt);
+				const sum = last_3.reduce((a, b) => a + b, 0);
+				const au = (sum / last_3.length) || 0;
+				if(au > avg_usg) {
+					avg_usg = au;
+					$('#usg_days').text("last " + last_3.length);
+				}
+				else {
+					$('#usg_days').text(cnt);
+				}
+				avg_usg = parseInt(avg_usg);
 			}
 			else {
 				avg_usg = '-';
@@ -287,7 +309,6 @@ redirect_from: "/tneb/"
 
 			$('#avg_pd').text(avg_usg);
 			$('#usg_td').text(total_usg);
-			$('#usg_days').text(cnt);
 			$('#last_usg_date').text(new Date(last_date).toJSON().slice(0, 10));
 
 			if(cnt < 1) {
@@ -323,10 +344,8 @@ redirect_from: "/tneb/"
 
 		function calculate_eb_amount(ebUnits) {
 			var ebAmount = 0;
-			var tariff = 0;
 			if (ebUnits > 0 && ebUnits <= 100) {
-				ebAmount = ebUnits * 2.25;
-				tariff = 0;
+				ebAmount = 0;
 			} else if (ebUnits <= 200) {
 				ebAmount = (ebUnits - 100) * 2.35;
 				tariff = ebAmount;
@@ -365,11 +384,21 @@ redirect_from: "/tneb/"
 		p.small {
 			margin-bottom: 0px;
 		}
+
+		.nav-btn {
+			padding: 4px;
+			margin-right: 10px;
+		}
+
+		.nav-btn i {
+			font-size: 28px;
+		}
 	</style>
 	<body>
 
 		<nav class="navbar navbar-dark bg-dark">
 			<span class="navbar-text">&nbsp;&nbsp;&nbsp;TNEB Bill Estimation and Daily Monitor</span>
+			<button class="btn btn-secondary nav-btn" data-bs-toggle="modal" data-bs-target="#calc-modal"><i class="fa-solid fa-calculator"></i></button>
 		</nav>
 
 		<div style="height: 2px;"></div>
@@ -495,6 +524,26 @@ redirect_from: "/tneb/"
 					<div class="modal-footer">
 						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
 						<button id="meter-add" type="button" class="btn btn-primary">Add</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="modal" tabindex="-1" id="calc-modal">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title">Bill Calculator</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+						<label for="new_meter_name">Enter Units in Kwh</label>
+						<input type="text" class="form-control" id="units-cons" placeholder="100">
+						<br/>
+						<p>Estimated Bill Amount: <b id="est-bill-amt">₹0.00</b></p>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
 					</div>
 				</div>
 			</div>
