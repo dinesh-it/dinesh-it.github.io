@@ -328,25 +328,25 @@ redirect_from: "/tneb/"
 				ebAmount = ebUnits * 2.25;
 				tariff = 0;
 			} else if (ebUnits <= 200) {
-				ebAmount = (ebUnits - 100) * 2.25;
+				ebAmount = (ebUnits - 100) * 2.35;
 				tariff = ebAmount;
 			} else if (ebUnits <= 400) {
-				ebAmount = 225 + ((ebUnits - 200) * 4.5);
+				ebAmount = 235 + ((ebUnits - 200) * 4.7);
 				tariff = ebAmount;
 			} else if (ebUnits <= 500) {
-				ebAmount = 1125 + ((ebUnits - 400) * 6);
+				ebAmount = 1175 + ((ebUnits - 400) * 6.3);
 				tariff = ebAmount;
 			} else if (ebUnits <= 600) {
-				ebAmount = 1950 + ((ebUnits - 500) * 8);
+				ebAmount = 2040 + ((ebUnits - 500) * 8.4);
 				tariff = ebAmount;
 			} else if (ebUnits <= 800) {
-				ebAmount = 2750 + ((ebUnits - 600) * 9);
+				ebAmount = 2040 + 840 + ((ebUnits - 600) * 9.45);
 				tariff = ebAmount;
 			} else if (ebUnits <= 1000) {
-				ebAmount = 4550 + ((ebUnits - 800) * 10);
+				ebAmount = 2040 + 840 + 1890 + ((ebUnits - 800) * 10.5);
 				tariff = ebAmount;
 			} else if (ebUnits > 1000) {
-				ebAmount = 6550 + ((ebUnits - 1000) * 11);
+				ebAmount = 2040 + 840 + 1890 + 2100 + ((ebUnits - 1000) * 11.55);
 				tariff = ebAmount;
 			} else {
 				tariff = 0;
@@ -450,8 +450,8 @@ redirect_from: "/tneb/"
 			<div class="mb-3">
 				<div class="ar-info alert alert-info ap-alert">
 					<p class="ap-alert-critical"><i class="fa-solid fa-circle-info"></i> Click on "New Bill" button to add latest bill information (EB Reading and Date) from you last bill from TNEB Card or from TNEB Portal. Once your last bill is added you can keep on add your current reading by taking current read from meter every day or whenever you have time (only one entry per day) and the app can show you the Bill estimation for this billing cycle and you also keep track and see the usage trend in your house. Currently This app supports only for TNEB Domestic Consumer meters.
-					Add New Bill whenever a new bill is generated
-					</p>
+					<p>Add New Bill whenever a new bill is generated</p>
+					<p>Tariff Last updated on 20 July 2024</p>
 				</div>
 				<center><a target="_blank" href="https://form.jotform.com/233202751788459">Submit Feedback/Suggestions here</a></center>
 			</div>
