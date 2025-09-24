@@ -1,0 +1,81 @@
+<html>
+	<head>
+		<title>Interval time calculator</title>
+	</head>
+	<body>
+
+		<input id="interval" value="15"/>
+		<button id="calc-btn" onclick="javascript:cal_interval();">Find Intervals</button>
+		<div id="op"></div>
+
+		<script>
+			function minToTime(min) {
+				let h = Math.floor(min / 60);
+				let m = min % 60;
+				let mer = 'AM';
+
+				h = h % 24;
+
+				if (h >= 12) {
+					mer = h !== 24 ? 'PM' : 'AM';
+					h = h > 12 ? h - 12 : h;
+				}
+
+				if (h === 0) {
+					h = 12;
+				}
+
+				return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')} ${mer}`;
+			}
+
+			function cal_interval() {
+
+				let startTime = 0;
+				let inp = document.getElementById('interval');
+				let interval = parseInt(inp.value);
+
+				if(!interval) {
+					alert("Please enter valid interval");
+					return;
+				}
+
+				let hours = [];
+				let intervalData = [];
+
+				let total = startTime;
+				let _int = startTime;
+
+				while (total < 1440) {
+					_int += interval;
+					total += interval;
+					let end = minToTime(total);
+					if (_int >= 60) {
+						let s_h = (Math.floor(total / 60) - 1) * 60;
+						let hStart = minToTime(s_h);
+						let hEnd = minToTime(s_h + 60);
+						hours.push(`${hStart} - ${hEnd}`);
+						_int = 0;
+					}
+					intervalData.push(end);
+				}
+
+				if (total > 1440 && _int !== 0) {
+					let s_h = (Math.floor(total / 60) - 1) * 60;
+					let hStart = minToTime(s_h);
+					let hEnd = minToTime(s_h + 60);
+					hours.push(`${hStart} - ${hEnd}`);
+				}
+
+				let div = document.getElementById('op');
+				let output = "";
+				intervalData.forEach(function(v, i){
+					output += "<li>" + v + "</li>";
+				});
+				div.innerHTML = output;
+
+				console.log(hours);
+				console.log(intervalData);
+			}
+		</script>
+	</body>
+</html>

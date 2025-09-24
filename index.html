@@ -1,366 +1,714 @@
 <!DOCTYPE html>
 <html lang="en">
 
-	<head>
-		<!-- Global site tag (gtag.js) - Google Analytics -->
-		<script async src="https://www.googletagmanager.com/gtag/js?idÚA-113057440-1"></script>
-		<script>
-			window.dataLayer = window.dataLayer || [];
-			function gtag(){dataLayer.push(arguments);}
-			gtag('js', new Date());
+<head>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-113057440-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-113057440-1');
+    </script>
 
-			gtag('config', 'UA-113057440-1');
-		</script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="title" property="og:title" content="DD Newgen Solutions - Innovative Software & Mobile App Development">
+    <meta name="description" property="og:description" content="Leading software development company specializing in custom web applications, mobile apps, and digital solutions. Trusted by businesses for quality software development.">
+    <meta name="author" content="DD Newgen Solutions">
+    <meta name="keywords" content="software development, mobile apps, web development, android apps, custom software, DD Newgen Solutions">
 
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-		<meta name="title" property="og:title" content="Dinesh D - Perl Developer, Trichy, TN, IN">
-		<meta name="description" property="og:description" content="Software Developer | Perl | Catalyst | PostgreSQL | JavaScript | HTML | CSS | JQuery | Bootstrap | Git | GitHub">
-		<meta name="author" content="Dinesh D">
+    <title>DD Newgen Solutions - Innovative Software Development</title>
 
-		<title>Dinesh D - Perl Developer, Trichy, TN, IN</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-		<!-- Bootstrap core CSS -->
-		<link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-		<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    <style>
+        /* Modern, sleek styling with dark mode support */
+        :root {
+            /* Light mode colors */
+            --primary-color: #2563eb;
+            --secondary-color: #1e40af;
+            --accent-color: #3b82f6;
+            --text-dark: #1f2937;
+            --text-light: #6b7280;
+            --bg-light: #f9fafb;
+            --bg-white: #ffffff;
+            --border-color: rgba(0,0,0,0.08);
+            --shadow: rgba(0,0,0,0.08);
+            --card-bg: #ffffff;
+        }
 
-		<!-- Custom styles for this template -->
-		<link href="css/main.css" rel="stylesheet">
+        [data-theme="dark"] {
+            /* Dark mode colors using your specified palette */
+            --primary-color: #948979;
+            --secondary-color: #DFD0B8;
+            --accent-color: #948979;
+            --text-dark: #DFD0B8;
+            --text-light: #948979;
+            --bg-light: #393E46;
+            --bg-white: #222831;
+            --border-color: rgba(255,255,255,0.1);
+            --shadow: rgba(0,0,0,0.3);
+            --card-bg: #393E46;
+        }
 
-	</head>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-	<body id="page-top">
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: var(--text-dark);
+            background-color: var(--bg-white);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
 
-		<div id="social_icons">
-			<ul class="list-inline list-social-icons mb-0">
-				<li class="list-inline-item">
-				<a href="https://www.facebook.com/dd.dinesh.rajakumar" target="_blank">
-					<span class="fa-stack fa-lg">
-						<i class="fa fa-circle fa-stack-2x"></i>
-						<i class="fa fa-facebook fa-stack-1x fa-inverse"></i>
-					</span>
-				</a>
-				</li>
-				<li class="list-inline-item">
-				<a href="https://twitter.com/DDineshDD" target="_blank">
-					<span class="fa-stack fa-lg">
-						<i class="fa fa-circle fa-stack-2x"></i>
-						<i class="fa fa-twitter fa-stack-1x fa-inverse"></i>
-					</span>
-				</a>
-				</li>
-				<li class="list-inline-item">
-				<a href="https://www.linkedin.com/in/dineshdharmalingam/" target="_blank">
-					<span class="fa-stack fa-lg">
-						<i class="fa fa-circle fa-stack-2x"></i>
-						<i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
-					</span>
-				</a>
-				</li>
-				<li class="list-inline-item">
-				<a href="https://github.com/dinesh-it" target="_blank">
-					<span class="fa-stack fa-lg">
-						<i class="fa fa-circle fa-stack-2x"></i>
-						<i class="fa fa-github fa-stack-1x fa-inverse"></i>
-					</span>
-				</a>
-				</li>
-			</ul>
-		</div>
+        /* Navigation */
+        .navbar {
+            background: var(--card-bg) !important;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 1px 20px var(--shadow);
+            transition: all 0.3s ease;
+            padding: 1rem 0;
+        }
 
-		<!-- Navigation -->
-		<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" id="mainNav">
-		<div class="container-fluid">
-			<a class="navbar-brand js-scroll-trigger" href="#page-top">Dinesh D</a>
-			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
-				<span class="navbar-toggler-icon"></span>
-			</button>
-			<div class="collapse navbar-collapse" id="navbarResponsive">
-				<ul class="navbar-nav ml-auto">
-					<li class="nav-item">
-					<a class="nav-link js-scroll-trigger" href="#about-content">About</a>
-					</li>
-					<li class="nav-item">
-					<a class="nav-link js-scroll-trigger" href="#experience-content">Experience</a>
-					</li>
-					<li class="nav-item">
-					<a class="nav-link js-scroll-trigger" href="#projects-content">Projects</a>
-					</li>
-					<li class="nav-item">
-					<a class="nav-link js-scroll-trigger" href="#skills-content">Skills</a>
-					</li>
-					<li class="nav-item">
-					<a class="nav-link js-scroll-trigger" href="#education-content">Education</a>
-					</li>
-					<li class="nav-item">
-					<a class="nav-link js-scroll-trigger" href="#acheivements-content">Acheivements</a>
-					</li>
-					<li class="nav-item">
-					<a class="nav-link js-scroll-trigger" href="#contact-content">Contact</a>
-					</li>
-					<li class="nav-item">
-					<a class="nav-link" target="_blank" href="https://dineshdtech.blogspot.in/">Blog</a>
-					</li>
-				</ul>
-			</div>
-		</div>
-		</nav>
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--primary-color) !important;
+        }
 
-		<header class="text-white my_photo_bg header-div">
-		<div class="container-fluid text-center header-content shadow-text">
-			<div class="alpha60">
-				<h1>Hi, I am Dinesh D</h1>
-				<p>Software Developer | Perl | Catalyst | PostgreSQL | JavaScript | HTML | CSS | JQuery | Bootstrap | Git | GitHub</p>
-			</div>
-		</div>
-		</header>
+        .nav-link {
+            color: var(--text-dark) !important;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
 
-		<section id="about-content">
-		<div class="container-fluid">
-			<div class="row">
-				<div class="col-lg-8 mx-auto">
-					<h3>About Me</h3>
-					<p>I am a M.Tech graduate from BITS Pilani (WILP), Working as a full stack software developer for last 5 years in perl, catalyst, javascript with PostgreSQL.</p>
-				</div>
-			</div>
-		</div>
-		</section>
+        .nav-link:hover {
+            color: var(--primary-color) !important;
+        }
 
-		<div id="for_resume">
-		<section id="experience-content">
-		<div class="container-fluid">
-			<div class="row">
-				<div class="col-lg-8 mx-auto">
-					<h3>Experience</h3>
-					<ul class="list-group-item main-group">
-						<li class="sub_title">Product Developer at Exceleron Software (July 2013 - Present)</li>
-						<ul>
-							<li class="details">
-							4+ Years experience in Web development with Perl catalyst framework, Worked on project - Prepaid Account Management System (PAMS), it is a web-based, hosted solution that communicates with existing AMI and CIS systems to manage prepaid accounts for electricity, gas, water, and other utility services. 
-							</li>
-							<li class="details">
-							My Contribution to PAMS: Involved in various design planning and Alerts Engine, Payment Gateway, Gamification.
-							</li>
-							<li class="details">
-							Experience gained: Perl with catalyst framework, PostgreSQL, Javascript, HTML, CSS, JQuery, Bootstrap, DataTables, Google/Apple Push Notification API's, SOAP and REST based Web services (both client and server side), Git and GitHub, Progress OpenAccess installation and configuration using their sdk, Unix server configurations, Network troubleshooting, Code reviews, Test driven development (TDD), Agile - Scrum software development and Team coordination.
-							</li>
-						</ul>
-					</ul>
-				</div>
-			</div>
-		</div>
-		</section>
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
 
-		<section id="projects-content">
-		<div class="container-fluid">
-			<div class="row">
-				<div class="col-lg-8 mx-auto">
-					<h3>Projects</h3>
-					<ul class="list-group-item main-group">
-						<li class="sub_title">Payment Gateway at Exceleron Software</li>
-						<ul>
-							<li class="details">
-							Its Excelerons own Payment Gateway to support users to make payments via Creditcard, Debitcard, ECheck. Its also Supports option to Opt for Auto Payment and Auto Recharge. 
-							</li>
-						</ul>
-					</ul>
-					<ul class="list-group-item main-group">
-						<li class="sub_title">Gamification at Exceleron Software</li>
-						<ul>
-							<li class="details">
-							Gamification is a feature of MyUsage which makes the user more engaged with MyUsage app by alloting badges for the actions done in MyUsage app. 
-							</li>
-						</ul>
-					</ul>
-					<ul class="list-group-item main-group">
-						<li class="sub_title">Alerts Engine at Exceleron Software</li>
-						<ul>
-							<li class="details">
-							Alerts engine is used to generate automated alerts to the users based on their usage. Where User and Utility can completely configure their alerts in the way they need. Alerts can be configured for SMS, Phone, Email, Push. 
-							</li>
-						</ul>
-					</ul>
-					<ul class="list-group-item main-group">
-						<li class="sub_title">Team Expense - Android app for personal Use</li>
-						<ul>
-							<li class="details">
-							A simple android app to note down the daily expenses made by each of the Room mates and at the end of month by single click we can get the share amount each person should give to other. It supports noting personal expenses too.
-							</li>
-						</ul>
-					</ul>
-				</div>
-			</div>
-		</div>
-		</section>
+        [data-theme="dark"] .hero {
+            background: linear-gradient(135deg, var(--bg-white) 0%, var(--bg-light) 100%);
+        }
 
-		<section id="skills-content">
-		<div class="container-fluid">
-			<div class="row">
-				<div class="col-lg-8 mx-auto">
-					<h3>Technical Skills</h3>
-					<p>Having potential to learn and adapt with any technology, but these are all some I have experienced with</p>
-					<ul>
-						<li><div class="progress_bar">
-							<span style="width: 80%">Perl, Catalyst, Javascript, VIM, PostgreSQL, JQuery</span> 80%
-						</div></li>
-						<li><div class="progress_bar">
-							<span style="width: 60%">HTML, CSS, Bootstrap, Shell Script</span> 60%
-						</div></li>
-						<li><div class="progress_bar">
-							<span style="width: 40%">Android Application, Android Studio</span> 40%
-						</div></li>
-						<li><div class="progress_bar">
-							<span style="width: 35%">Unix Administration, Neworking</span> 35%
-						</div></li>
-						<li class="details">
-						Basics of Cloud Computing and Amazon Cloud Services
-						</li>
-					</ul>
-				</div>
-			</div>
-		</div>
-		</section>
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
 
-		<section id="education-content">
-		<div class="container-fluid">
-			<div class="row">
-				<div class="col-lg-8 mx-auto">
-					<h3>Educational Qualification</h3>
-					<ul class="list-group-item main-group">
-						<li>
-						<strong class="text-bold">M.Tech in Software Systems - 2017 - CGPA: 7.8</strong>
-						<p>BITS Pilani, through Work Integrated Learning Programmes (WILP)</p>
-						</li>
-						<li>
-						<strong>B.Tech in Information Technology - 2013 - CGPA: 7.8</strong>
-						<p>Saranathan College of Engineering, Trichy, TN</p>
-						</li>
-						<li>
-						<strong>Higher Secondary - 2009 - Scored: 80.83%</strong>
-						<p>Bishop Heber Hr. Sec. School, Theppakulam, Trichy, TN</p>
-						</li>
-						<li>
-						<strong>S.S.L.C - 2007 - Scored: 85.40%</strong>
-						<p>Bishop Heber Hr. Sec. School, Theppakulam, Trichy, TN</p>
-						</li>
-					</ul>
-					<ul class="list-group-item main-group">
-						<li class="sub_title">Training</li>
-						<ul>
-							<li><strong>Cloud Ready DevOps Engineer - 2013 : </strong>Here I had training and hands on experience on Linux Operating system, Network monitoring and troubleshooting, Monitoring tools (Nagios), Configure and used AWS EC2 instances</li>
-						</ul>
-						<ul>
-							<li><strong>Computer Hardware - 2011 : </strong>Here I was trained for Computer system internals, System assembling, System troubleshooting, Partitioning etc</li>
-						</ul>
-					</ul>
+        .hero h1 {
+            font-size: 4rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: white;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
 
-				</div>
-			</div>
-		</div>
-		</section>
+        .hero .lead {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            color: rgba(255,255,255,0.9);
+        }
 
-		<section id="acheivements-content">
-		<div class="container-fluid">
-			<div class="row">
-				<div class="col-lg-8 mx-auto">
-					<h3>Acheivements</h3>
-					<ul class="list-group-item main-group">
-						<li class="sub_title">Best Employee - 2015</li>
-						<ul>
-							<li class="details">
-							One of the best performer award at Exceleron software
-							</li>
-						</ul>
-					</ul>
-					<ul class="list-group-item main-group">
-						<li class="sub_title">M.Tech through WILP - 2014</li>
-						<ul>
-							<li class="details">
-							Successfully joined M.Tech in Software Systems course through Work Integrated Learning Programmes
-							</li>
-						</ul>
-					</ul>
-					<ul class="list-group-item main-group">
-						<li class="sub_title">Best out going student - 2013</li>
-						<ul>
-							<li class="details">
-							Received BEST OUT GOING STUDENT in IT Department Award from my college
-							</li>
-						</ul>
-					</ul>
-					<ul class="list-group-item main-group">
-						<li class="sub_title">100% Attendance - 2013</li>
-						<ul>
-							<li class="details">
-							Got 100% Attendance Award at college ( For all 8 Semesters / 4 years )
-							</li>
-						</ul>
-					</ul>
-					<ul class="list-group-item main-group">
-						<li class="sub_title">Cloud Computing presentation</li>
-						<ul>
-							<li class="details">
-							Presented a paper on CLOUD COMPUTING at Saranathan College of Engineering, IT Association Events and won 3 rd prize
-							</li>
-						</ul>
-					</ul>
-				</div>
-			</div>
-		</div>
-		</section>
+        .btn-primary-custom {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
 
-		<section id="contact-content">
-		<div class="container-fluid">
-			<div class="row">
-				<div class="col-md-8 mx-auto">
-					<h3>Contact Details</h3>
-					<div class="col-md-6">
-						<strong>Email:</strong>
-						<span>dd.dinesh.rajakumar at gmail.com</span>
-					</div>
-					<div class="col-lg-6">
-						<strong>Blog:</strong>
-						<a target="_blank" href="https://dineshdtech.blogspot.in/">Dinesh Dharmalingam</a>
-					</div>
+        .btn-primary-custom:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(255,107,107,0.4);
+        }
 
-				</div>
-			</div>
-		</div>
-		</section>
-		</div>
+        .btn-outline-custom {
+            border: 2px solid rgba(255,255,255,0.8);
+            color: white;
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            background: transparent;
+        }
 
-		<!-- Footer -->
-		<footer class="py-3 bg-dark" style="padding-bottom: 0px !important;">
-		<div class="container-fluid">
-			<div class="row">
-				<div class="col-md-3 text-left text-white">
-					<span>Updated On: 19/01/2017</span>
-				</div>
-				<div class="col-md-3 text-center text-white">
-					<span>&copy; Dinesh D</span>
-				</div>
-				<div class="col-md-3 text-center text-white">
-					<div align='center'><a href='http://www.free-website-hit-counter.com'><img src='http://www.free-website-hit-counter.com/c.php?d=9&id=112853&s=5' border='0' title='free website hit counter'></a><br / ><small><a href='http://www.free-website-hit-counter.com' title="free website hit counter">Free website hit counter</a></small></div>
-				</div>
-			</div>
-			<div class="row">
-			</div>
-		</div>
-		<!-- /.container -->
-		</footer>
+        .btn-outline-custom:hover {
+            background: white;
+            color: var(--primary-color);
+            transform: translateY(-3px);
+        }
 
-		<!-- Bootstrap core JavaScript -->
-		<script src="vendor/jquery/jquery.min.js"></script>
-		<script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+        /* Sections */
+        section {
+            padding: 100px 0;
+        }
 
-		<!-- Plugin JavaScript -->
-		<script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+        .section-title {
+            font-size: 3rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+        }
 
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.5/jspdf.debug.js"></script>
-		<script src="vendor/html2canvas.min.js"></script>
+        .section-subtitle {
+            font-size: 1.2rem;
+            text-align: center;
+            color: var(--text-light);
+            margin-bottom: 4rem;
+        }
 
-		<!-- Custom JavaScript -->
-		<script src="js/main.js"></script>
-	</body>
+        /* Cards */
+        .card-modern {
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px var(--shadow);
+            transition: all 0.3s ease;
+            overflow: hidden;
+            height: 100%;
+            background: var(--card-bg);
+        }
+
+        .card-modern:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 30px 60px var(--shadow);
+        }
+
+        .card-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 2rem;
+            color: white;
+            font-size: 2rem;
+        }
+
+        /* Products Section */
+        .product-card {
+            background: var(--card-bg);
+            border-radius: 25px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+            border: 1px solid var(--border-color);
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 50px var(--shadow);
+        }
+
+        /* Theme Toggle */
+        .theme-toggle {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            z-index: 1000;
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 50px;
+            padding: 10px 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px var(--shadow);
+        }
+
+        .theme-toggle:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px var(--shadow);
+        }
+
+        .theme-toggle i {
+            font-size: 1.2rem;
+            color: var(--text-dark);
+            transition: all 0.3s ease;
+        }
+
+        /* Background sections */
+        .bg-light {
+            background-color: var(--bg-light) !important;
+        }
+
+        /* App Icons */
+        .app-icon img {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 8px 25px var(--shadow);
+        }
+
+        .app-icon img:hover {
+            transform: scale(1.05);
+            box-shadow: 0 12px 35px var(--shadow);
+        }
+
+        .product-icon {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(45deg, #ff9a9e, #fecfef);
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: white;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Stats Section */
+        .stats {
+            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 100%);
+            color: white;
+        }
+
+        [data-theme="dark"] .stats {
+            background: linear-gradient(135deg, var(--bg-light) 0%, var(--card-bg) 100%);
+            color: var(--text-dark);
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 2rem 0;
+        }
+
+        .stat-number {
+            font-size: 3.5rem;
+            font-weight: 700;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--text-dark);
+            color: white;
+            padding: 50px 0 30px;
+        }
+
+        .social-link {
+            color: white;
+            font-size: 1.5rem;
+            margin: 0 15px;
+            transition: all 0.3s ease;
+        }
+
+        .social-link:hover {
+            color: var(--accent-color);
+            transform: translateY(-3px);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero .lead {
+                font-size: 1.2rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+        }
+
+        /* Animation */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fade-in {
+            animation: fadeInUp 0.6s ease;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Theme Toggle -->
+    <div class="theme-toggle" id="themeToggle" title="Toggle theme">
+        <i class="fas fa-moon" id="themeIcon"></i>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#home">
+                <i class="fas fa-code me-2"></i>DD Newgen Solutions
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#home">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#about">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#services">Services</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#products">Products</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#contact">Contact</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="about/">Team</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <div class="hero-content animate-fade-in">
+                        <h1>Innovative Software Solutions</h1>
+                        <p class="lead">We create cutting-edge web applications, mobile apps, and custom software that drive business growth and digital transformation.</p>
+                        <div class="d-flex flex-wrap gap-3">
+                            <a href="#products" class="btn btn-primary-custom">Our Products</a>
+                            <a href="#contact" class="btn btn-outline-custom">Get Started</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 text-center">
+                    <div class="hero-image">
+                        <i class="fas fa-laptop-code" style="font-size: 15rem; color: rgba(255,255,255,0.1);"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="bg-light">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <h2 class="section-title">About DD Newgen Solutions</h2>
+                    <p class="section-subtitle">Pioneering the future of software development</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-6 mb-4">
+                    <div class="card-modern p-4">
+                        <div class="card-icon">
+                            <i class="fas fa-rocket"></i>
+                        </div>
+                        <h4 class="text-center mb-3">Our Mission</h4>
+                        <p class="text-center">To deliver innovative, scalable, and user-centric software solutions that empower businesses to thrive in the digital age.</p>
+                    </div>
+                </div>
+                <div class="col-lg-6 mb-4">
+                    <div class="card-modern p-4">
+                        <div class="card-icon">
+                            <i class="fas fa-eye"></i>
+                        </div>
+                        <h4 class="text-center mb-3">Our Vision</h4>
+                        <p class="text-center">To be the leading software development company known for creating transformative digital experiences and mobile applications.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <h2 class="section-title">Our Services</h2>
+                    <p class="section-subtitle">Comprehensive software development solutions</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card-modern p-4 text-center">
+                        <div class="card-icon">
+                            <i class="fas fa-globe"></i>
+                        </div>
+                        <h4>Web Development</h4>
+                        <p>Custom web applications built with modern frameworks like Perl Catalyst, JavaScript, and responsive design principles.</p>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card-modern p-4 text-center">
+                        <div class="card-icon">
+                            <i class="fas fa-mobile-alt"></i>
+                        </div>
+                        <h4>Mobile App Development</h4>
+                        <p>Native Android applications that deliver exceptional user experiences and solve real-world problems.</p>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card-modern p-4 text-center">
+                        <div class="card-icon">
+                            <i class="fas fa-database"></i>
+                        </div>
+                        <h4>Database Solutions</h4>
+                        <p>Robust database architecture and optimization using PostgreSQL and modern data management practices.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Products Section -->
+    <section id="products" class="bg-light">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <h2 class="section-title">Our Mobile Applications</h2>
+                    <p class="section-subtitle">Innovative Android apps designed to simplify your life</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-4 mb-4">
+                    <div class="product-card text-center">
+                        <div class="app-icon mx-auto mb-3">
+                            <img src="images/apps/home-diary-icon.png" alt="Home Diary App Icon" style="width: 100px; height: 100px; border-radius: 20px; object-fit: cover;">
+                        </div>
+                        <h3 class="mb-3">Home Diary</h3>
+                        <p class="mb-4">An all-in-one home management solution for household needs. Features include milk purchase tracking with smart pricing, todo list management, grocery listing, simple expense manager, and a comprehensive notes app. Perfect for organizing your entire household in one convenient app.</p>
+                        <div class="mb-3">
+                            <span class="badge bg-primary me-2">Milk Tracking</span>
+                            <span class="badge bg-success me-2">Todo Lists</span>
+                            <span class="badge bg-info me-2">Grocery Lists</span>
+                            <span class="badge bg-warning me-2">Expense Manager</span>
+                            <span class="badge bg-secondary">Notes App</span>
+                        </div>
+                        <div class="mt-3">
+                            <a href="https://play.google.com/store/apps/details?id=com.dineshdharmalingam.homediary" target="_blank" class="btn btn-sm me-2" style="background: linear-gradient(45deg, #ff6b6b, #ee5a24); color: white; border: none; border-radius: 20px; padding: 8px 20px;">
+                                <i class="fab fa-google-play me-1"></i>Play Store
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 mb-4">
+                    <div class="product-card text-center">
+                        <div class="app-icon mx-auto mb-3">
+                            <img src="images/apps/cash-counter-icon.png" alt="Cash Counter App Icon" style="width: 100px; height: 100px; border-radius: 20px; object-fit: cover;">
+                        </div>
+                        <h3 class="mb-3">CashCounter</h3>
+                        <p class="mb-4">A modern mobile application for counting and managing cash denominations. Features a unified interface with toggle modes: Count to Total (calculate from denominations) and Total to Count (optimal denomination breakdown). Supports multiple currencies and languages.</p>
+                        <div class="mb-3">
+                            <span class="badge bg-warning me-2">Denomination Counter</span>
+                            <span class="badge bg-danger me-2">Multi-Currency</span>
+                            <span class="badge bg-secondary">Tamil/English</span>
+                        </div>
+                        <div class="mt-3">
+                            <a href="https://play.google.com/store/apps/details?id=com.dineshdharmalingam.cashcounter" target="_blank" class="btn btn-sm me-2" style="background: linear-gradient(45deg, #ff6b6b, #ee5a24); color: white; border: none; border-radius: 20px; padding: 8px 20px;">
+                                <i class="fab fa-google-play me-1"></i>Play Store
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 mb-4">
+                    <div class="product-card text-center">
+                        <div class="app-icon mx-auto mb-3">
+                            <img src="images/apps/eb-calculator-icon.png" alt="EB Bill Calculator App Icon" style="width: 100px; height: 100px; border-radius: 20px; object-fit: cover;">
+                        </div>
+                        <h3 class="mb-3">EB Bill Calculator</h3>
+                        <p class="mb-4">A comprehensive Tamil Nadu Electricity Board (TNEB) bill calculator and usage tracker. Manage multiple meters, record daily readings, track consumption patterns, and get accurate bill estimates using official TNEB tariff structure (updated July 2024).</p>
+                        <div class="mb-3">
+                            <span class="badge bg-success me-2">TNEB Tariff</span>
+                            <span class="badge bg-primary me-2">Multi-Meter</span>
+                            <span class="badge bg-warning">Usage Analytics</span>
+                        </div>
+                        <div class="mt-3">
+                            <a href="https://play.google.com/store/apps/details?id=com.dineshdharmalingam.ebbillcalculator" target="_blank" class="btn btn-sm me-2" style="background: linear-gradient(45deg, #ff6b6b, #ee5a24); color: white; border: none; border-radius: 20px; padding: 8px 20px;">
+                                <i class="fab fa-google-play me-1"></i>Play Store
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <h2 class="section-title">Get In Touch</h2>
+                    <p class="section-subtitle">Ready to start your next project? Let's discuss your requirements</p>
+                    <div class="col-lg-8 mx-auto text-center">
+                     <div class="mb-4">
+                        <p class="mb-4" style="font-size: 1.2rem; color: var(--text-light);">
+                            <strong>dd.newgen.solutions@gmail.com</strong>
+                        </p>
+                        <a href="mailto:dd.newgen.solutions@gmail.com" class="btn btn-primary-custom btn-lg">Send Email</a>
+                    </div>
+                </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <p class="mb-0">&copy; 2025 DD Newgen Solutions. All rights reserved. | Built with passion for innovation.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Custom JavaScript -->
+    <script>
+        // Theme Management with System Preference Detection
+        class ThemeManager {
+            constructor() {
+                this.themeToggle = document.getElementById('themeToggle');
+                this.themeIcon = document.getElementById('themeIcon');
+                this.init();
+            }
+
+            init() {
+                // Check for saved theme preference or default to system preference
+                const savedTheme = localStorage.getItem('theme');
+                const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+                if (savedTheme) {
+                    this.setTheme(savedTheme);
+                } else if (systemPrefersDark) {
+                    this.setTheme('dark');
+                } else {
+                    this.setTheme('light');
+                }
+
+                // Listen for theme toggle clicks
+                this.themeToggle.addEventListener('click', () => this.toggleTheme());
+
+                // Listen for system theme changes
+                window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+                    if (!localStorage.getItem('theme')) {
+                        this.setTheme(e.matches ? 'dark' : 'light');
+                    }
+                });
+            }
+
+            setTheme(theme) {
+                if (theme === 'dark') {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                    this.themeIcon.className = 'fas fa-sun';
+                } else {
+                    document.documentElement.removeAttribute('data-theme');
+                    this.themeIcon.className = 'fas fa-moon';
+                }
+                localStorage.setItem('theme', theme);
+            }
+
+            toggleTheme() {
+                const currentTheme = document.documentElement.getAttribute('data-theme');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                this.setTheme(newTheme);
+            }
+
+            getCurrentTheme() {
+                return document.documentElement.getAttribute('data-theme') || 'light';
+            }
+        }
+
+        // Initialize theme manager
+        document.addEventListener('DOMContentLoaded', () => {
+            new ThemeManager();
+        });
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Navbar background change on scroll (removed hardcoded colors)
+        window.addEventListener('scroll', function() {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 50) {
+                navbar.style.opacity = '0.98';
+            } else {
+                navbar.style.opacity = '0.95';
+            }
+        });
+
+        // Animation on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-fade-in');
+                }
+            });
+        }, observerOptions);
+
+        // Observe all cards and sections
+        document.querySelectorAll('.card-modern, .product-card, .stat-item').forEach(el => {
+            observer.observe(el);
+        });
+    </script>
+
+</body>
 
 </html>
