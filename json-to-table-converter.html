@@ -1,0 +1,1758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON to Table Converter</title>
+    <!-- PGLite - PostgreSQL in the browser -->
+    <script type="module">
+        import { PGlite } from 'https://cdn.jsdelivr.net/npm/@electric-sql/pglite/dist/index.js';
+        window.PGlite = PGlite;
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* VS Code Dark Theme Colors */
+        :root {
+            --bg-primary: #1e1e1e;
+            --bg-secondary: #252526;
+            --bg-tertiary: #2d2d30;
+            --bg-hover: #3e3e42;
+            --border-color: #464647;
+            --text-primary: #d4d4d4;
+            --text-secondary: #858585;
+            --accent-primary: #007acc;
+            --accent-secondary: #0e639c;
+            --success: #4ec9b0;
+            --error: #f48771;
+            --warning: #dcdcaa;
+        }
+
+        body {
+            font-family: 'Fira Code', 'Menlo', 'Monaco', 'Courier New', monospace;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: var(--bg-secondary);
+            padding: 8px 16px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+
+        h1 {
+            color: var(--text-primary);
+            font-size: 14px;
+            font-weight: 600;
+            margin: 0;
+            letter-spacing: 0.5px;
+        }
+
+        .header-subtitle {
+            color: var(--text-secondary);
+            font-size: 12px;
+            margin: 0;
+            font-weight: normal;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 0;
+            margin: 0;
+            flex: 1;
+            overflow: hidden;
+            border-bottom: 1px solid var(--border-color);
+            min-height: 300px;
+            transition: min-height 0.3s ease, flex 0.3s ease;
+        }
+
+        .main-grid.collapsed {
+            min-height: 32px;
+            flex: 0;
+        }
+
+        .main-grid.collapsed > .panel {
+            display: none;
+        }
+
+        .panel {
+            background: var(--bg-primary);
+            padding: 8px 12px;
+            border: none;
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transition: min-width 0.3s ease;
+            min-height: 0;
+        }
+
+        .panel:last-child {
+            border-right: none;
+        }
+
+        .panel-content {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            min-height: 0;
+        }
+
+        .panel.collapsed {
+            min-width: 40px;
+            padding: 8px 4px;
+            flex: 0;
+        }
+
+        .panel.collapsed h2 {
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            margin: 0;
+            padding: 8px 0;
+            transform: rotate(180deg);
+            font-size: 11px;
+        }
+
+        .panel.collapsed .panel-content {
+            display: none !important;
+        }
+
+        .panel.collapsed > div:first-child {
+            display: flex !important;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 8px;
+            margin-bottom: 0 !important;
+        }
+
+        .panel.collapsed .collapse-btn {
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            transform: rotate(180deg);
+            padding: 4px 0;
+        }
+
+        .collapse-btn {
+            background: transparent;
+            border: none;
+            color: var(--accent-primary);
+            cursor: pointer;
+            padding: 4px 8px;
+            font-size: 12px;
+            height: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .collapse-btn:hover {
+            background: var(--bg-hover);
+            border: 1px solid var(--border-color);
+        }
+
+        .panel h2 {
+            font-size: 12px;
+            color: var(--accent-primary);
+            margin: 0 0 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .section-icon {
+            font-size: 14px;
+        }
+
+        .input-section {
+            display: grid;
+            gap: 8px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 0;
+            margin-bottom: 8px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .tabs[style*="border: none"] {
+            border-bottom: none !important;
+        }
+
+        .tab-button {
+            padding: 6px 12px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            color: var(--text-secondary);
+            font-size: 12px;
+            font-weight: 500;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .tab-button:hover {
+            color: var(--text-primary);
+            background: var(--bg-hover);
+        }
+
+        .tab-button.active {
+            color: var(--accent-primary);
+            border-bottom-color: var(--accent-primary);
+            background: transparent;
+        }
+
+        .tab-content {
+            display: none;
+            flex: 1;
+            overflow: auto;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            font-family: 'Fira Code', 'Monaco', monospace;
+            font-size: 12px;
+            resize: none;
+            flex: 1;
+            transition: border-color 0.2s ease;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            background: var(--bg-tertiary);
+        }
+
+        textarea::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .file-input-wrapper input[type="file"] {
+            display: none;
+        }
+
+        .file-input-label {
+            display: block;
+            padding: 8px;
+            background: var(--bg-tertiary);
+            border: 1px dashed var(--border-color);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--accent-primary);
+            font-weight: 500;
+            font-size: 12px;
+        }
+
+        .file-input-label:hover {
+            background: var(--bg-hover);
+            border-color: var(--accent-primary);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin: 8px 0;
+            align-items: center;
+        }
+
+        button {
+            padding: 6px 12px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        button:hover {
+            background: var(--bg-hover);
+            border-color: var(--accent-primary);
+        }
+
+        .btn-primary {
+            background: var(--accent-primary);
+            color: #fff;
+            border-color: var(--accent-primary);
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-secondary);
+            border-color: var(--accent-secondary);
+        }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-hover);
+        }
+
+        .btn-danger {
+            background: #d16969;
+            color: #fff;
+            border-color: #d16969;
+        }
+
+        .btn-danger:hover {
+            background: #f48771;
+            border-color: #f48771;
+        }
+
+        .search-filter-container {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+            align-items: center;
+        }
+
+        .search-box {
+            position: relative;
+            flex: 1;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 6px 8px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 12px;
+            transition: border-color 0.2s ease;
+            height: 32px;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+        }
+
+        .search-box input::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .table-wrapper {
+            overflow: auto;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            flex: 1;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+
+        thead {
+            background: var(--bg-tertiary);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        th {
+            padding: 6px 8px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--accent-primary);
+            cursor: pointer;
+            user-select: none;
+            white-space: nowrap;
+            border-right: 1px solid var(--border-color);
+        }
+
+        th:last-child {
+            border-right: none;
+        }
+
+        th:hover {
+            background: var(--bg-hover);
+        }
+
+        .sort-indicator {
+            margin-left: 4px;
+            font-size: 10px;
+        }
+
+        td {
+            padding: 6px 8px;
+            border-bottom: 1px solid var(--border-color);
+            word-break: break-word;
+            max-width: 400px;
+            border-right: 1px solid var(--border-color);
+        }
+
+        td:last-child {
+            border-right: none;
+        }
+
+        tbody tr:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .column-selector {
+            background: var(--bg-tertiary);
+            padding: 8px;
+            margin-bottom: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .column-list {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .column-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            padding: 4px 6px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 3px;
+            cursor: move;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .column-item:hover {
+            background: var(--bg-hover);
+            border-color: var(--accent-primary);
+        }
+
+        .column-item.dragging {
+            opacity: 0.5;
+            background: var(--accent-secondary);
+        }
+
+        .column-item.drag-over {
+            border-top: 2px solid var(--accent-primary);
+            padding-top: 2px;
+        }
+
+        .column-item .drag-handle {
+            cursor: grab;
+            color: var(--text-secondary);
+            font-size: 10px;
+            padding: 0 4px;
+            flex-shrink: 0;
+        }
+
+        .column-item .drag-handle:active {
+            cursor: grabbing;
+        }
+
+        .column-item input[type="checkbox"] {
+            cursor: pointer;
+            width: 14px;
+            height: 14px;
+            accent-color: var(--accent-primary);
+            flex-shrink: 0;
+        }
+
+        .column-item label {
+            cursor: pointer;
+            flex: 1;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .filter-controls {
+            background: var(--bg-tertiary);
+            padding: 8px;
+            margin-bottom: 8px;
+            border: 1px solid var(--border-color);
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .filter-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr auto;
+            gap: 6px;
+            margin-bottom: 6px;
+            align-items: center;
+        }
+
+        .filter-row select,
+        .filter-row input {
+            padding: 4px 6px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 11px;
+            transition: border-color 0.2s ease;
+        }
+
+        .filter-row select:focus,
+        .filter-row input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+        }
+
+        .status-message {
+            padding: 8px 12px;
+            margin-bottom: 8px;
+            font-size: 12px;
+            display: none;
+            border-left: 3px solid;
+        }
+
+        .status-message.show {
+            display: block;
+        }
+
+        .status-message.success {
+            background: rgba(78, 201, 176, 0.1);
+            color: var(--success);
+            border-left-color: var(--success);
+        }
+
+        .status-message.error {
+            background: rgba(244, 135, 113, 0.1);
+            color: var(--error);
+            border-left-color: var(--error);
+        }
+
+        .status-message.info {
+            background: rgba(0, 122, 204, 0.1);
+            color: var(--accent-primary);
+            border-left-color: var(--accent-primary);
+        }
+
+        .pglite-section {
+            background: var(--bg-tertiary);
+            padding: 8px;
+            border: 1px solid var(--border-color);
+            margin-top: 8px;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+
+        .pglite-section h3 {
+            margin-bottom: 8px;
+            color: var(--accent-primary);
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        .query-input {
+            width: 100%;
+            padding: 6px 8px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 12px;
+            margin-bottom: 6px;
+            resize: none;
+            min-height: 80px;
+        }
+
+        .query-input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+        }
+
+        .query-result {
+            background: var(--bg-primary);
+            padding: 8px;
+            margin-top: 8px;
+            border: 1px solid var(--border-color);
+            flex: 1;
+            overflow-y: auto;
+            font-size: 12px;
+            min-height: 0;
+            font-family: 'Fira Code', 'Monaco', monospace;
+        }
+
+        .query-result table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+        }
+
+        .query-result th {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            padding: 6px 8px;
+            text-align: left;
+            color: var(--accent-primary);
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+        }
+
+        .query-result td {
+            border: 1px solid var(--border-color);
+            padding: 6px 8px;
+            color: var(--text-primary);
+        }
+
+        .query-result tbody tr:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .query-result tbody tr:nth-child(even) {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .json-preview {
+            background: var(--bg-tertiary);
+            padding: 8px;
+            border: 1px solid var(--border-color);
+            font-family: 'Fira Code', 'Monaco', monospace;
+            font-size: 11px;
+            max-height: 100px;
+            overflow-y: auto;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin: 8px 0;
+        }
+
+        .stat-card {
+            background: var(--bg-tertiary);
+            color: var(--accent-primary);
+            padding: 8px;
+            border: 1px solid var(--border-color);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .stat-label {
+            font-size: 10px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        @media (max-width: 768px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-row {
+                grid-template-columns: 1fr;
+            }
+
+            .search-filter-container {
+                grid-template-columns: 1fr;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 20px;
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+
+        .json-structure-info {
+            background: rgba(0, 122, 204, 0.1);
+            border-left: 3px solid var(--accent-primary);
+            padding: 8px;
+            margin-bottom: 8px;
+            font-size: 12px;
+            color: var(--accent-primary);
+        }
+
+        .copy-btn {
+            padding: 4px 8px;
+            font-size: 11px;
+        }
+
+        .hide {
+            display: none !important;
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 12px;
+            height: 12px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 6px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>JSON2Table</h1>
+            <button class="collapse-btn" id="gridCollapseBtn" onclick="toggleMainGrid()" title="Collapse top panels" style="margin-left: auto;">▼</button>
+        </div>
+
+        <div class="main-grid">
+            <!-- Input Panel -->
+            <div class="panel" style="display: flex; flex-direction: column;">
+                <h2><span class="section-icon"></span> INPUT</h2>
+                <div class="panel-content">
+                    <textarea id="jsonInput" placeholder='{"key": "value"}' style="flex: 1; resize: none; margin-bottom: 8px;"></textarea>
+
+                    <div style="display: flex; gap: 6px; margin-bottom: 8px;">
+                        <input type="file" id="fileInput" accept=".json,.txt" style="flex: 1; padding: 6px 8px; border: 1px solid var(--border-color); background: var(--bg-tertiary); color: var(--text-primary); border-radius: 4px; font-size: 12px; cursor: pointer;" />
+                        <button class="btn-primary" onclick="parseJSON()">Parse</button>
+                        <button class="btn-secondary" onclick="clearInput()">Clear</button>
+                    </div>
+
+                    <div id="statusMessage" class="status-message"></div>
+                </div>
+            </div>
+
+            <!-- Configuration Panel -->
+            <div class="panel" id="configPanel">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                    <div style="display: flex; align-items: center; gap: 4px; flex: 1;">
+                        <h2 style="margin: 0;"><span class="section-icon"></span> CONFIG</h2>
+                    </div>
+                    <h3 style="font-size: 11px; color: var(--accent-primary); text-transform: uppercase; margin: 0;">Columns</h3>
+                </div>
+
+                <div class="panel-content">
+                    <div>
+                        <div id="columnSelector" class="column-selector hide">
+                            <div class="button-group">
+                                <button class="btn-secondary btn-sm" onclick="selectAllColumns()">All</button>
+                                <button class="btn-secondary btn-sm" onclick="deselectAllColumns()">None</button>
+                            </div>
+                            <div id="columnList" class="column-list"></div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 6px;">Options</h3>
+                        <div id="optionsPanel" style="display: none;">
+                            <label style="display: flex; align-items: center; gap: 6px; margin-bottom: 6px; cursor: pointer; font-size: 12px;">
+                                <input type="checkbox" id="includeIndexes" checked>
+                                <span>Array indexes</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 6px;">Filters</h3>
+                        <div id="filterControls" class="filter-controls hide">
+                            <div id="filterList"></div>
+                            <button class="btn-secondary" onclick="addFilterRow()">+ Add</button>
+                        </div>
+                    </div>
+
+                    <div class="stats" id="statsContainer" style="display: none;">
+                        <div class="stat-card">
+                            <div class="stat-value" id="statRows">0</div>
+                            <div class="stat-label">Rows</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="statColumns">0</div>
+                            <div class="stat-label">Cols</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="statFiltered">0</div>
+                            <div class="stat-label">View</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Expanded Details Panel -->
+            <div class="panel">
+                <h2><span class="section-icon"></span> DETAILS</h2>
+                <div class="panel-content">
+                    <div id="jsonStructureInfo" class="json-structure-info hide"></div>
+
+                    <div id="detailsEmpty" style="color: var(--text-secondary); font-size: 12px; padding: 12px; text-align: center;">
+                        Parse JSON to see details
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search and Table Panel -->
+        <div class="panel" style="mid-height: 10px;" id="outputPanel-title">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <h2 style="margin: 0; flex: 1;"><span class="section-icon"></span> OUTPUT</h2>
+                <button class="collapse-btn" onclick="toggleOutputPanel()" title="Collapse OUTPUT panel">◄</button>
+            </div>
+		</div>
+
+        <div class="panel" id="outputPanel">
+            <div class="panel-content">
+                <div class="search-filter-container">
+                    <div class="search-box">
+                        <input type="text" id="searchInput" placeholder="Search..." onkeyup="applySearch()">
+                    </div>
+                    <div class="button-group">
+                        <button class="btn-secondary" onclick="exportToCSV()">CSV</button>
+                        <button class="btn-secondary" onclick="exportToJSON()">JSON</button>
+                    </div>
+                </div>
+
+                <div id="tableContainer" class="table-wrapper hide">
+                    <table id="dataTable">
+                        <thead id="tableHead"></thead>
+                        <tbody id="tableBody"></tbody>
+                    </table>
+                </div>
+
+                <div id="noData" class="no-data hide">
+                    <p>No data. Parse JSON to start.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- PGLite Section -->
+        <div class="panel" style="min-height: 50px;">
+            <h2><span class="section-icon"></span> QUERY</h2>
+            <div class="panel-content">
+                <div id="pgliteNotReady" style="text-align: center; color: var(--text-secondary); padding: 12px; font-size: 12px;">
+                    Parse JSON to enable queries
+                </div>
+
+                <div id="pgliteSection" class="pglite-section hide">
+                    <div style="display: flex; gap: 8px; margin-bottom: 8px; align-items: center;">
+                        <span style="color: var(--text-primary); font-size: 12px; font-weight: 500;">DB:</span>
+                        <span id="dbTableName" style="color: var(--accent-primary); font-size: 12px; font-family: 'Fira Code', monospace;">json_data</span>
+                        <button class="btn-secondary" onclick="reloadDatabase()" title="Reload database from current data" style="margin-left: auto; padding: 4px 8px; font-size: 11px;">Reload</button>
+                    </div>
+
+                    <div style="display: flex; gap: 6px; margin-bottom: 8px;">
+                        <textarea id="sqlQuery" class="query-input" placeholder="SELECT * FROM json_data LIMIT 10;"></textarea>
+                        <button class="btn-primary" onclick="executeSQLQuery()" title="Execute query (Ctrl+Enter)" style="height: auto; padding: 8px 12px; align-self: flex-start;">Execute</button>
+                    </div>
+
+                    <div id="queryResult" class="query-result hide">
+                        <div id="resultContent"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global state
+        let jsonData = null;
+        let parsedData = [];
+        let allColumns = [];
+        let selectedColumns = [];
+        let filters = [];
+        let pgliteDB = null;
+        let sortConfig = { column: null, direction: 'asc' };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            setupEventListeners();
+        });
+
+        function setupEventListeners() {
+            // File input
+            const fileInput = document.getElementById('fileInput');
+            fileInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        document.getElementById('jsonInput').value = event.target.result;
+                    };
+                    reader.readAsText(file);
+                }
+            });
+
+            // SQL Query keyboard shortcut (Ctrl+Enter)
+            const sqlQuery = document.getElementById('sqlQuery');
+            if (sqlQuery) {
+                sqlQuery.addEventListener('keydown', (e) => {
+                    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                        e.preventDefault();
+                        executeSQLQuery();
+                    }
+                });
+            }
+        }
+
+        function toggleOutputPanel() {
+            const outputPanel = document.getElementById('outputPanel');
+            const btn = outputPanel.querySelector('.collapse-btn');
+
+            outputPanel.classList.toggle('collapsed');
+
+            if (outputPanel.classList.contains('collapsed')) {
+                btn.textContent = '▶';
+                btn.title = 'Expand OUTPUT panel';
+            } else {
+                btn.textContent = '◄';
+                btn.title = 'Collapse OUTPUT panel';
+            }
+        }
+
+        function toggleMainGrid() {
+            const mainGrid = document.querySelector('.main-grid');
+            const btn = document.getElementById('gridCollapseBtn');
+
+            mainGrid.classList.toggle('collapsed');
+
+            if (mainGrid.classList.contains('collapsed')) {
+                btn.textContent = '▲';
+                btn.title = 'Expand top panels';
+            } else {
+                btn.textContent = '▼';
+                btn.title = 'Collapse top panels';
+            }
+        }
+
+        function showStatus(message, type = 'success') {
+            const statusEl = document.getElementById('statusMessage');
+            statusEl.textContent = message;
+            statusEl.className = `status-message show ${type}`;
+
+            if (type !== 'error') {
+                setTimeout(() => {
+                    statusEl.classList.remove('show');
+                }, 3000);
+            }
+        }
+
+        function parseJSON() {
+            try {
+                const input = document.getElementById('jsonInput').value.trim();
+
+                if (!input) {
+                    showStatus('Please paste or upload JSON data', 'error');
+                    return;
+                }
+
+                jsonData = JSON.parse(input);
+
+                // Normalize data to array of objects
+                normalizeData();
+
+                // Detect structure
+                detectStructure();
+
+                // Build column list
+                buildColumns();
+
+                // Build table
+                buildTable();
+
+                // Initialize PGLite
+                initializePGLite();
+
+                showStatus('JSON parsed successfully! ' + parsedData.length + ' records found.', 'success');
+            } catch (error) {
+                showStatus('Invalid JSON: ' + error.message, 'error');
+            }
+        }
+
+        function normalizeData() {
+            // Step 1: Flatten all paths to leaf values
+            const flatPaths = flattenToLeafPaths(jsonData);
+
+            // Step 2: Convert to CSV-like format
+            const csvRows = pathsToCSV(flatPaths);
+
+            // Step 3: Parse CSV to rows with smart column grouping
+            parsedData = csvToRows(csvRows);
+        }
+
+        // Step 1: Flatten JSON to all leaf paths
+        // Returns: { "Demographic.Age and Gender.All.MA_Payment": 8405.09, ... }
+        function flattenToLeafPaths(obj, parentKey = '') {
+            let flattened = {};
+
+            if (obj === null || obj === undefined) {
+                return { [parentKey]: obj };
+            }
+
+            if (typeof obj !== 'object') {
+                return { [parentKey]: obj };
+            }
+
+            if (Array.isArray(obj)) {
+                obj.forEach((item, index) => {
+                    const key = parentKey ? `${parentKey}[${index}]` : `[${index}]`;
+                    Object.assign(flattened, flattenToLeafPaths(item, key));
+                });
+                return flattened;
+            }
+
+            const keys = Object.keys(obj);
+            let hasNestedObject = false;
+
+            keys.forEach(key => {
+                const value = obj[key];
+                const newKey = parentKey ? `${parentKey}.${key}` : key;
+
+                if (value === null || value === undefined) {
+                    flattened[newKey] = value;
+                } else if (typeof value === 'object') {
+                    hasNestedObject = true;
+                    Object.assign(flattened, flattenToLeafPaths(value, newKey));
+                } else {
+                    flattened[newKey] = value;
+                }
+            });
+
+            return flattened;
+        }
+
+        // Step 2: Convert flattened paths to CSV format
+        function pathsToCSV(flatPaths) {
+            // Each flattened path becomes a row in CSV
+            // Path: "Demographic.Age and Gender.All.MA_Payment"
+            // Value: 8405.09
+            const rows = [];
+
+            for (let path in flatPaths) {
+                const value = flatPaths[path];
+                const parts = path.split('.');
+                const record = {};
+
+                // Split path into parts (except last which is the metric name)
+                parts.forEach((part, index) => {
+                    if (index < parts.length - 1) {
+                        record[`path_${index}`] = part;
+                    } else {
+                        record['metric'] = part;
+                    }
+                });
+
+                record['value'] = value;
+                rows.push(record);
+            }
+
+            return rows;
+        }
+
+        // Step 3: Convert CSV rows to final table with smart column grouping
+        function csvToRows(csvRows) {
+            if (csvRows.length === 0) return [];
+
+            // Find max path depth
+            let maxPathDepth = 0;
+            csvRows.forEach(row => {
+                let depth = 0;
+                while (row[`path_${depth}`] !== undefined) {
+                    depth++;
+                    maxPathDepth = Math.max(maxPathDepth, depth);
+                }
+            });
+
+            // Group rows by their path (everything except metric)
+            const grouped = {};
+
+            csvRows.forEach(row => {
+                // Create path key from path_0, path_1, path_2, etc.
+                const pathKeys = [];
+                for (let i = 0; i < maxPathDepth; i++) {
+                    if (row[`path_${i}`] !== undefined) {
+                        pathKeys.push(row[`path_${i}`]);
+                    }
+                }
+                const pathKey = pathKeys.join('|');
+
+                if (!grouped[pathKey]) {
+                    grouped[pathKey] = {};
+                    pathKeys.forEach((key, index) => {
+                        grouped[pathKey][`path_${index}`] = key;
+                    });
+                }
+
+                // Add metric as column
+                grouped[pathKey][row.metric] = row.value;
+            });
+
+            // Convert grouped object to array
+            const result = Object.values(grouped);
+
+            // Clean up and rename columns
+            result.forEach(row => {
+                // Rename path_0, path_1 to more meaningful names
+                const pathNames = ['Category', 'SubCategory', 'Type', 'Status', 'Level5', 'Level6'];
+                for (let i = 0; i < pathNames.length; i++) {
+                    if (row[`path_${i}`] !== undefined) {
+                        row[pathNames[i]] = row[`path_${i}`];
+                        delete row[`path_${i}`];
+                    }
+                }
+            });
+
+            return result;
+        }
+
+        function detectStructure() {
+            if (parsedData.length === 0) return;
+
+            const sample = parsedData[0];
+            let details = [];
+
+            if (typeof sample === 'object') {
+                const keys = Object.keys(sample);
+                details.push(`<strong>Columns:</strong> ${keys.length}`);
+                details.push(`<strong>Rows:</strong> ${parsedData.length}`);
+                details.push(`<strong>Fields:</strong> ${keys.slice(0, 5).join(', ')}${keys.length > 5 ? '...' : ''}`);
+            }
+
+            const infoEl = document.getElementById('jsonStructureInfo');
+            infoEl.innerHTML = `${details.map(d => `• ${d}`).join('<br>')}`;
+            infoEl.classList.remove('hide');
+
+            // Hide empty state
+            const detailsEmpty = document.getElementById('detailsEmpty');
+            if (detailsEmpty) {
+                detailsEmpty.classList.add('hide');
+            }
+        }
+
+        function buildColumns() {
+            allColumns = [];
+
+            if (parsedData.length === 0) return;
+
+            const sample = parsedData[0];
+            if (typeof sample === 'object') {
+                allColumns = Object.keys(sample).sort();
+            }
+
+            selectedColumns = [...allColumns];
+
+            // Render column selector with drag-drop support
+            renderColumnList();
+
+            document.getElementById('columnSelector').classList.remove('hide');
+            document.getElementById('filterControls').classList.remove('hide');
+            document.getElementById('optionsPanel').style.display = 'block';
+
+            // Add change listener to index checkbox
+            const indexCheckbox = document.getElementById('includeIndexes');
+            indexCheckbox.removeEventListener('change', handleIndexChange);
+            indexCheckbox.addEventListener('change', handleIndexChange);
+        }
+
+        function handleIndexChange() {
+            parseJSON();
+        }
+
+        function renderColumnList() {
+            const columnList = document.getElementById('columnList');
+            columnList.innerHTML = '';
+
+            allColumns.forEach((col, index) => {
+                const div = document.createElement('div');
+                div.className = 'column-item';
+                div.draggable = true;
+                div.dataset.columnIndex = index;
+                div.dataset.columnName = col;
+
+                div.innerHTML = `
+                    <span class="drag-handle">⋮⋮</span>
+                    <input type="checkbox" id="col_${col}" checked onchange="updateSelectedColumns()">
+                    <label for="col_${col}">${escapeHtml(col)}</label>
+                `;
+
+                // Drag events
+                div.addEventListener('dragstart', handleDragStart);
+                div.addEventListener('dragover', handleDragOver);
+                div.addEventListener('drop', handleDrop);
+                div.addEventListener('dragend', handleDragEnd);
+                div.addEventListener('dragenter', handleDragEnter);
+                div.addEventListener('dragleave', handleDragLeave);
+
+                columnList.appendChild(div);
+            });
+        }
+
+        let draggedElement = null;
+
+        function handleDragStart(e) {
+            draggedElement = this;
+            this.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+        }
+
+        function handleDragEnter(e) {
+            if (this !== draggedElement) {
+                this.classList.add('drag-over');
+            }
+        }
+
+        function handleDragLeave(e) {
+            this.classList.remove('drag-over');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            if (this !== draggedElement) {
+                // Swap columns
+                const draggedIndex = parseInt(draggedElement.dataset.columnIndex);
+                const targetIndex = parseInt(this.dataset.columnIndex);
+
+                // Swap in allColumns array
+                [allColumns[draggedIndex], allColumns[targetIndex]] = [allColumns[targetIndex], allColumns[draggedIndex]];
+
+                // Re-render the column list
+                renderColumnList();
+
+                // Update table with new column order
+                updateSelectedColumns();
+            }
+        }
+
+        function handleDragEnd(e) {
+            this.classList.remove('dragging');
+            document.querySelectorAll('.column-item').forEach(item => {
+                item.classList.remove('drag-over');
+            });
+            draggedElement = null;
+        }
+
+        function updateSelectedColumns() {
+            selectedColumns = [];
+            // Get columns in the current order from allColumns array
+            allColumns.forEach(col => {
+                const checkbox = document.getElementById(`col_${col}`);
+                if (checkbox && checkbox.checked) {
+                    selectedColumns.push(col);
+                }
+            });
+            buildTable();
+        }
+
+        function selectAllColumns() {
+            allColumns.forEach(col => {
+                const checkbox = document.getElementById(`col_${col}`);
+                if (checkbox) checkbox.checked = true;
+            });
+            updateSelectedColumns();
+        }
+
+        function deselectAllColumns() {
+            allColumns.forEach(col => {
+                const checkbox = document.getElementById(`col_${col}`);
+                if (checkbox) checkbox.checked = false;
+            });
+            updateSelectedColumns();
+        }
+
+        function buildTable() {
+            const tableHead = document.getElementById('tableHead');
+            const tableBody = document.getElementById('tableBody');
+            const tableContainer = document.getElementById('tableContainer');
+            const noDataEl = document.getElementById('noData');
+
+            let filteredData = getFilteredData();
+
+            if (selectedColumns.length === 0 || filteredData.length === 0) {
+                tableContainer.classList.add('hide');
+                noDataEl.classList.remove('hide');
+                document.getElementById('statsContainer').style.display = 'none';
+                return;
+            }
+
+            // Build header
+            tableHead.innerHTML = '';
+            selectedColumns.forEach(col => {
+                const th = document.createElement('th');
+                th.innerHTML = `${escapeHtml(col)} <span class="sort-indicator">${getSortIndicator(col)}</span>`;
+                th.onclick = () => sortTable(col);
+                tableHead.appendChild(th);
+            });
+
+            // Build body
+            tableBody.innerHTML = '';
+            filteredData.forEach(row => {
+                const tr = document.createElement('tr');
+                selectedColumns.forEach(col => {
+                    const td = document.createElement('td');
+                    const value = row[col];
+                    td.textContent = formatCellValue(value);
+                    tr.appendChild(td);
+                });
+                tableBody.appendChild(tr);
+            });
+
+            tableContainer.classList.remove('hide');
+            noDataEl.classList.add('hide');
+
+            // Update stats
+            updateStats(filteredData);
+            document.getElementById('statsContainer').style.display = 'grid';
+        }
+
+        function getFilteredData() {
+            let filtered = [...parsedData];
+
+            // Apply filters
+            if (filters.length > 0) {
+                filtered = filtered.filter(row => {
+                    return filters.every(filter => {
+                        if (!filter.column || !filter.operator || filter.value === '') return true;
+
+                        const value = row[filter.column];
+                        const filterVal = filter.value;
+
+                        switch (filter.operator) {
+                            case 'equals':
+                                return String(value).toLowerCase() === filterVal.toLowerCase();
+                            case 'contains':
+                                return String(value).toLowerCase().includes(filterVal.toLowerCase());
+                            case 'starts':
+                                return String(value).toLowerCase().startsWith(filterVal.toLowerCase());
+                            case 'ends':
+                                return String(value).toLowerCase().endsWith(filterVal.toLowerCase());
+                            case 'gt':
+                                return Number(value) > Number(filterVal);
+                            case 'lt':
+                                return Number(value) < Number(filterVal);
+                            case 'gte':
+                                return Number(value) >= Number(filterVal);
+                            case 'lte':
+                                return Number(value) <= Number(filterVal);
+                            default:
+                                return true;
+                        }
+                    });
+                });
+            }
+
+            // Apply search
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            if (searchTerm) {
+                filtered = filtered.filter(row => {
+                    return selectedColumns.some(col => {
+                        return String(row[col]).toLowerCase().includes(searchTerm);
+                    });
+                });
+            }
+
+            // Apply sorting
+            if (sortConfig.column) {
+                filtered.sort((a, b) => {
+                    let aVal = a[sortConfig.column];
+                    let bVal = b[sortConfig.column];
+
+                    if (typeof aVal === 'string') {
+                        aVal = aVal.toLowerCase();
+                        bVal = bVal.toLowerCase();
+                    }
+
+                    if (aVal < bVal) return sortConfig.direction === 'asc' ? -1 : 1;
+                    if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1;
+                    return 0;
+                });
+            }
+
+            return filtered;
+        }
+
+        function applySearch() {
+            buildTable();
+        }
+
+        function sortTable(column) {
+            if (sortConfig.column === column) {
+                sortConfig.direction = sortConfig.direction === 'asc' ? 'desc' : 'asc';
+            } else {
+                sortConfig.column = column;
+                sortConfig.direction = 'asc';
+            }
+            buildTable();
+        }
+
+        function getSortIndicator(column) {
+            if (sortConfig.column !== column) return '';
+            return sortConfig.direction === 'asc' ? '↑' : '↓';
+        }
+
+        function addFilterRow() {
+            filters.push({ column: '', operator: 'contains', value: '' });
+            renderFilters();
+        }
+
+        function renderFilters() {
+            const filterList = document.getElementById('filterList');
+            filterList.innerHTML = '';
+
+            filters.forEach((filter, index) => {
+                const div = document.createElement('div');
+                div.className = 'filter-row';
+                div.innerHTML = `
+                    <select onchange="updateFilter(${index}, 'column', this.value)">
+                        <option value="">Select Column</option>
+                        ${allColumns.map(col => `<option value="${col}" ${filter.column === col ? 'selected' : ''}>${escapeHtml(col)}</option>`).join('')}
+                    </select>
+                    <select onchange="updateFilter(${index}, 'operator', this.value)">
+                        <option value="contains" ${filter.operator === 'contains' ? 'selected' : ''}>Contains</option>
+                        <option value="equals" ${filter.operator === 'equals' ? 'selected' : ''}>Equals</option>
+                        <option value="starts" ${filter.operator === 'starts' ? 'selected' : ''}>Starts with</option>
+                        <option value="ends" ${filter.operator === 'ends' ? 'selected' : ''}>Ends with</option>
+                        <option value="gt" ${filter.operator === 'gt' ? 'selected' : ''}>Greater than</option>
+                        <option value="lt" ${filter.operator === 'lt' ? 'selected' : ''}>Less than</option>
+                        <option value="gte" ${filter.operator === 'gte' ? 'selected' : ''}>≥</option>
+                        <option value="lte" ${filter.operator === 'lte' ? 'selected' : ''}>≤</option>
+                    </select>
+                    <input type="text" placeholder="Filter value" value="${filter.value}" onchange="updateFilter(${index}, 'value', this.value)">
+                    <button class="btn-danger btn-sm" onclick="removeFilter(${index})" style="padding: 8px 12px;">×</button>
+                `;
+                filterList.appendChild(div);
+            });
+
+            if (filters.length > 0) {
+                buildTable();
+            }
+        }
+
+        function updateFilter(index, field, value) {
+            if (filters[index]) {
+                filters[index][field] = value;
+                buildTable();
+            }
+        }
+
+        function removeFilter(index) {
+            filters.splice(index, 1);
+            renderFilters();
+        }
+
+        function updateStats(data) {
+            document.getElementById('statRows').textContent = parsedData.length;
+            document.getElementById('statColumns').textContent = selectedColumns.length;
+            document.getElementById('statFiltered').textContent = data.length;
+        }
+
+        function formatCellValue(value) {
+            if (value === null || value === undefined) return '';
+            if (typeof value === 'object') {
+                return JSON.stringify(value).substring(0, 50) + '...';
+            }
+            return String(value).substring(0, 200);
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        async function initializePGLite() {
+            try {
+                // Check if PGLite is available
+                if (!window.PGlite) {
+                    showStatus('PGLite library loading... Please wait', 'info');
+                    setTimeout(initializePGLite, 500);
+                    return;
+                }
+
+                if (!pgliteDB) {
+                    // Initialize the PGLite database
+                    pgliteDB = new window.PGlite();
+                    // Test connection
+                    await pgliteDB.query("SELECT 1");
+                }
+
+                // Create and load table
+                await reloadDatabase();
+
+            } catch (error) {
+                console.error('Database Error:', error);
+                showStatus('Database initialization failed: ' + error.message, 'error');
+            }
+        }
+
+        async function reloadDatabase() {
+            try {
+                if (!pgliteDB) {
+                    showStatus('Database not initialized', 'error');
+                    return;
+                }
+
+                // Get current filtered data
+                const data = getFilteredData();
+                if (data.length === 0) {
+                    showStatus('No data to load into database', 'error');
+                    return;
+                }
+
+                // Drop existing table if it exists
+                try {
+                    await pgliteDB.query('DROP TABLE IF EXISTS json_data');
+                } catch (e) {
+                    // Ignore if table doesn't exist
+                }
+
+                // Create table with proper column types
+                const columns = selectedColumns.map(col => {
+                    const sample = data.find(row => row[col] !== null && row[col] !== undefined);
+                    const value = sample ? sample[col] : '';
+                    let type = 'TEXT';
+
+                    if (typeof value === 'number') {
+                        type = 'NUMERIC';
+                    } else if (typeof value === 'boolean') {
+                        type = 'BOOLEAN';
+                    }
+
+                    return `"${col}" ${type}`;
+                }).join(', ');
+
+                // Create table without auto id - just use the columns from data
+                const createTableSQL = `CREATE TABLE json_data (${columns})`;
+                await pgliteDB.query(createTableSQL);
+
+                // Insert data using parameterized queries
+                const insertCols = selectedColumns.map(col => `"${col}"`).join(', ');
+                const placeholders = selectedColumns.map((_, i) => `$${i + 1}`).join(', ');
+                const insertSQL = `INSERT INTO json_data (${insertCols}) VALUES (${placeholders})`;
+
+                for (const row of data) {
+                    const values = selectedColumns.map(col => {
+                        const val = row[col];
+                        return val === null || val === undefined ? null : val;
+                    });
+                    try {
+                        await pgliteDB.query(insertSQL, values);
+                    } catch (e) {
+                        console.warn('Row insert error:', e);
+                    }
+                }
+
+                // Show database is ready
+                document.getElementById('pgliteSection').classList.remove('hide');
+                document.getElementById('pgliteNotReady').classList.add('hide');
+
+                // Update table name display
+                document.getElementById('dbTableName').textContent = 'json_data (' + data.length + ' rows)';
+
+                showStatus('Database loaded with ' + data.length + ' rows', 'success');
+
+            } catch (error) {
+                console.error('Database reload error:', error);
+                showStatus('Failed to load data into database: ' + error.message, 'error');
+            }
+        }
+
+        async function executeSQLQuery() {
+            try {
+                if (!pgliteDB) {
+                    showStatus('Database not initialized yet. Please wait and try again.', 'error');
+                    return;
+                }
+
+                const query = document.getElementById('sqlQuery').value.trim();
+                if (!query) {
+                    showStatus('Please enter a SQL query', 'error');
+                    return;
+                }
+
+                // Execute query and get results
+                try {
+                    const result = await pgliteDB.query(query);
+
+                    // Handle different result types
+                    const rows = result.rows || result || [];
+                    displayQueryResult(Array.isArray(rows) ? rows : []);
+                    showStatus('Query executed successfully', 'success');
+                } catch (e) {
+                    showStatus('Query error: ' + e.message, 'error');
+                    document.getElementById('queryResult').classList.add('hide');
+                }
+
+            } catch (error) {
+                showStatus('Query error: ' + error.message, 'error');
+                document.getElementById('queryResult').classList.add('hide');
+            }
+        }
+
+        function displayQueryResult(result) {
+            const resultContent = document.getElementById('resultContent');
+            const queryResult = document.getElementById('queryResult');
+
+            if (!result || result.length === 0) {
+                resultContent.innerHTML = '<div style="color: var(--text-secondary); padding: 12px; text-align: center;">(0 rows)</div>';
+            } else {
+                let html = '<table><thead><tr>';
+
+                // Get columns from first row
+                const keys = Object.keys(result[0]);
+                keys.forEach(key => {
+                    html += `<th>${escapeHtml(String(key))}</th>`;
+                });
+                html += '</tr></thead><tbody>';
+
+                // Limit display to 1000 rows for performance
+                const displayRows = result.slice(0, 1000);
+                displayRows.forEach(row => {
+                    html += '<tr>';
+                    keys.forEach(key => {
+                        const value = row[key];
+                        const displayValue = value === null || value === undefined ? 'NULL' : String(value);
+                        html += `<td>${escapeHtml(displayValue.substring(0, 100))}</td>`;
+                    });
+                    html += '</tr>';
+                });
+
+                html += '</tbody></table>';
+
+                // Add row count
+                if (result.length > displayRows.length) {
+                    html += `<div style="color: var(--text-secondary); padding: 8px; font-size: 11px; margin-top: 8px;">Showing ${displayRows.length} of ${result.length} rows</div>`;
+                } else {
+                    html += `<div style="color: var(--text-secondary); padding: 8px; font-size: 11px; margin-top: 8px;">${result.length} row${result.length !== 1 ? 's' : ''}</div>`;
+                }
+
+                resultContent.innerHTML = html;
+            }
+
+            queryResult.classList.remove('hide');
+        }
+
+        function exportToCSV() {
+            const data = getFilteredData();
+            if (data.length === 0) {
+                showStatus('No data to export', 'error');
+                return;
+            }
+
+            let csv = selectedColumns.map(col => `"${col.replace(/"/g, '""')}"`).join(',') + '\n';
+
+            data.forEach(row => {
+                csv += selectedColumns.map(col => {
+                    const value = row[col];
+                    const escaped = String(value).replace(/"/g, '""');
+                    return `"${escaped}"`;
+                }).join(',') + '\n';
+            });
+
+            downloadFile(csv, 'data.csv', 'text/csv');
+        }
+
+        function exportToJSON() {
+            const data = getFilteredData();
+            if (data.length === 0) {
+                showStatus('No data to export', 'error');
+                return;
+            }
+
+            const json = JSON.stringify(data, null, 2);
+            downloadFile(json, 'data.json', 'application/json');
+        }
+
+        function downloadFile(content, filename, type) {
+            const blob = new Blob([content], { type });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showStatus(`Exported as ${filename}`, 'success');
+        }
+
+        function clearInput() {
+            document.getElementById('jsonInput').value = '';
+            document.getElementById('fileInput').value = '';
+            jsonData = null;
+            parsedData = [];
+            selectedColumns = [];
+            allColumns = [];
+            filters = [];
+            document.getElementById('tableContainer').classList.add('hide');
+            document.getElementById('noData').classList.add('hide');
+            document.getElementById('columnSelector').classList.add('hide');
+            document.getElementById('filterControls').classList.add('hide');
+            document.getElementById('pgliteSection').classList.add('hide');
+            document.getElementById('jsonStructureInfo').classList.add('hide');
+            document.getElementById('detailsEmpty').classList.remove('hide');
+            document.getElementById('statusMessage').classList.remove('show');
+        }
+    </script>
+</body>
+</html>
