@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>PostgreSQL Terminal Playground</title>
+	<style>
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
+
+		body {
+			font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+			background-color: #0d0d0d;
+			color: #d4d4d4;
+			height: 100vh;
+			display: flex;
+			flex-direction: column;
+		}
+
+		.header {
+			padding: 15px 20px;
+			background-color: #1a1a1a;
+			border-bottom: 1px solid #2d2d2d;
+			font-size: 14px;
+			max-height: 200px;
+			overflow-y: auto;
+		}
+
+		.header h1 {
+			font-size: 16px;
+			margin-bottom: 5px;
+		}
+
+		.status {
+			font-size: 12px;
+			color: #858585;
+		}
+
+		.status.connected {
+			color: #4ec9b0;
+		}
+
+		.container {
+			display: flex;
+			flex-direction: column;
+			flex: 1;
+			overflow: hidden;
+			background-color: #0d0d0d;
+		}
+
+		.output-panel {
+			flex: 1;
+			overflow-y: auto;
+			overflow-x: hidden;
+			padding: 15px 20px;
+			background-color: #0d0d0d;
+			display: flex;
+			flex-direction: column;
+		}
+
+		.output-line {
+			margin-bottom: 8px;
+			white-space: pre-wrap;
+			word-break: break-word;
+			line-height: 1.4;
+		}
+
+		.prompt {
+			color: #4ec9b0;
+		}
+
+		.command {
+			color: #ce9178;
+			margin-bottom: 0;
+			margin-top: 8px;
+		}
+
+		.result {
+			color: #d4d4d4;
+			margin-bottom: 0;
+		}
+
+		.error {
+			color: #f48771;
+		}
+
+		.table-result {
+			border-collapse: collapse;
+			margin: 8px 0;
+			font-size: 12px;
+		}
+
+		.table-result th {
+			background-color: #1a1a1a;
+			padding: 6px 8px;
+			text-align: left;
+			border: 1px solid #2d2d2d;
+			color: #4ec9b0;
+			font-weight: bold;
+		}
+
+		.table-result td {
+			padding: 4px 8px;
+			border: 1px solid #2d2d2d;
+			color: #d4d4d4;
+		}
+
+		.table-result tr:nth-child(even) {
+			background-color: #151515;
+		}
+
+		.input-panel {
+			padding: 0;
+			background-color: #0d0d0d;
+			border-top: 1px solid #2d2d2d;
+			display: flex;
+			align-items: center;
+			flex-shrink: 0;
+		}
+
+		.prompt-symbol {
+			padding: 12px 15px;
+			color: #4ec9b0;
+			white-space: nowrap;
+			user-select: none;
+			font-weight: bold;
+		}
+
+		#commandInput {
+			flex: 1;
+			background-color: #0d0d0d;
+			border: none;
+			color: #d4d4d4;
+			font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+			font-size: 14px;
+			padding: 12px 0 12px 5px;
+			outline: none;
+			caret-color: #4ec9b0;
+			margin-right: 15px;
+		}
+
+		#commandInput::placeholder {
+			color: #555555;
+		}
+
+		#commandInput:focus {
+			background-color: #1a1a1a;
+		}
+
+		.help-text {
+			color: #858585;
+			font-size: 12px;
+			margin-top: 10px;
+		}
+
+		::-webkit-scrollbar {
+			width: 8px;
+		}
+
+		::-webkit-scrollbar-track {
+			background: #0d0d0d;
+		}
+
+		::-webkit-scrollbar-thumb {
+			background: #2d2d2d;
+			border-radius: 4px;
+		}
+
+		::-webkit-scrollbar-thumb:hover {
+			background: #3d3d3d;
+		}
+
+		.info {
+			color: #9cdcfe;
+		}
+
+		.disclaimer-header {
+			cursor: pointer;
+			display: flex;
+			align-items: center;
+			user-select: none;
+		}
+
+		.disclaimer-header:hover {
+			color: #d4d4d4;
+		}
+
+		.disclaimer-toggle {
+			display: inline-block;
+			margin-right: 8px;
+			transition: transform 0.2s ease;
+			color: #4ec9b0;
+		}
+
+		.disclaimer-toggle.collapsed {
+			transform: rotate(0deg);
+		}
+
+		.disclaimer-toggle.expanded {
+			transform: rotate(90deg);
+		}
+
+		.disclaimer-content {
+			max-height: 500px;
+			overflow: hidden;
+			transition: max-height 0.3s ease;
+			margin-top: 10px;
+		}
+
+		.disclaimer-content.collapsed {
+			max-height: 0;
+			margin-top: 0;
+			overflow: hidden;
+		}
+	</style>
+</head>
+<body>
+	<div class="header">
+		<h1>PostgreSQL Terminal Playground</h1>
+		<div class="status" id="status">Initializing database...</div>
+		<div style="margin-top: 10px; font-size: 12px; color: #858585; line-height: 1.6;">
+			<p><strong>About this project:</strong> This is an in-browser SQL playground powered by PGlite, a lightweight PostgreSQL implementation that runs entirely in your browser. It's perfect for learning SQL, testing queries, and experimenting with databases without needing a server.</p>
+
+			<div class="disclaimer-header" onclick="toggleDisclaimer()">
+				<span class="disclaimer-toggle collapsed" id="toggleIcon">▶</span>
+				<span><strong>⚠️ Important Disclaimers (Click to expand)</strong></span>
+			</div>
+
+			<div class="disclaimer-content collapsed" id="disclaimerContent">
+				<ul style="margin-left: 20px; margin-top: 10px;">
+					<li><strong>Client-Only:</strong> All data processing happens locally in your browser. No data is sent to any server.</li>
+					<li><strong>No Data Collection:</strong> We do not collect, store, or monitor any of your data or queries.</li>
+					<li><strong>No Warranty:</strong> This tool is provided as-is without any warranty or guarantee. We accept no responsibility for data loss or any issues that may occur.</li>
+					<li><strong>PGlite, Not Full PostgreSQL:</strong> This uses PGlite, a subset of PostgreSQL. Some advanced features and SQL syntax may not be supported. For production use, use a full PostgreSQL server.</li>
+					<li><strong>Data Persistence:</strong> Your data is stored only in your browser's memory and will be lost when you refresh or close the page.</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+
+	<div class="container">
+		<div class="output-panel" id="output">
+			<!-- Terminal output goes here -->
+		</div>
+
+		<div class="input-panel">
+			<span class="prompt-symbol">postgres=></span>
+			<input
+				type="text"
+				id="commandInput"
+				placeholder="Enter SQL command (type 'help' for commands)"
+				spellcheck="false"
+				autocomplete="off"
+			/>
+		</div>
+	</div>
+
+	<script>
+		function toggleDisclaimer() {
+			const content = document.getElementById('disclaimerContent');
+			const icon = document.getElementById('toggleIcon');
+
+			content.classList.toggle('collapsed');
+			icon.classList.toggle('collapsed');
+			icon.classList.toggle('expanded');
+		}
+	</script>
+
+	<script type="module">
+		import { PGlite } from 'https://cdn.jsdelivr.net/npm/@electric-sql/pglite/dist/index.js';
+
+		let db;
+		let commandHistory = [];
+		let historyIndex = -1;
+
+		const output = document.getElementById('output');
+		const commandInput = document.getElementById('commandInput');
+		const status = document.getElementById('status');
+
+		async function initializeDatabase() {
+			try {
+				db = new PGlite();
+				await db.query("SELECT 1");
+				status.textContent = '✓ Connected to PGlite';
+				status.classList.add('connected');
+				addOutput('Welcome to PostgreSQL Terminal Playground!', 'info');
+				addOutput('Type "help" for available commands.', 'info');
+			} catch (error) {
+				status.textContent = '✗ Failed to initialize database';
+				addOutput(`Error: ${error.message}`, 'error');
+			}
+		}
+
+		function addOutput(text, className = 'result') {
+			const line = document.createElement('div');
+			line.className = `output-line ${className}`;
+			line.textContent = text;
+			output.appendChild(line);
+			output.scrollTop = output.scrollHeight;
+		}
+
+		function addTableOutput(columns, rows) {
+			const table = document.createElement('table');
+			table.className = 'table-result';
+
+			// Header
+			const thead = document.createElement('thead');
+			const headerRow = document.createElement('tr');
+			columns.forEach(col => {
+				const th = document.createElement('th');
+				th.textContent = col;
+				headerRow.appendChild(th);
+			});
+			thead.appendChild(headerRow);
+			table.appendChild(thead);
+
+			// Body
+			const tbody = document.createElement('tbody');
+			rows.forEach(row => {
+				const tr = document.createElement('tr');
+				columns.forEach(col => {
+					const td = document.createElement('td');
+					const value = row[col];
+					td.textContent = value === null ? 'NULL' : String(value);
+					tr.appendChild(td);
+				});
+				tbody.appendChild(tr);
+			});
+			table.appendChild(tbody);
+
+			output.appendChild(table);
+			output.scrollTop = output.scrollHeight;
+		}
+
+		function showHelp() {
+			addOutput('\n=== Available Commands ===', 'info');
+			addOutput('SELECT ... - Execute a SELECT query', 'info');
+			addOutput('INSERT ... - Insert data', 'info');
+			addOutput('UPDATE ... - Update data', 'info');
+			addOutput('DELETE ... - Delete data', 'info');
+			addOutput('CREATE TABLE ... - Create a table', 'info');
+			addOutput('DROP TABLE ... - Drop a table', 'info');
+			addOutput('\\d - List all tables', 'info');
+			addOutput('\\dt - List tables', 'info');
+			addOutput('clear - Clear the terminal', 'info');
+			addOutput('help - Show this help message', 'info');
+			addOutput('exit - Exit the terminal\n', 'info');
+		}
+
+		async function listTables() {
+			try {
+				const result = await db.query(`
+					SELECT table_name
+					FROM information_schema.tables
+					WHERE table_schema = 'public'
+					ORDER BY table_name
+				`);
+
+				if (result.rows.length === 0) {
+					addOutput('No tables found.', 'result');
+				} else {
+					addOutput(`\nTables in public schema:`, 'info');
+					result.rows.forEach(row => {
+						addOutput(`  - ${row.table_name}`, 'result');
+					});
+					addOutput('');
+				}
+			} catch (error) {
+				addOutput(`Error: ${error.message}`, 'error');
+			}
+		}
+
+		async function executeCommand(command) {
+			const trimmedCommand = command.trim();
+
+			if (!trimmedCommand) return;
+
+			// Add to history
+			commandHistory.unshift(trimmedCommand);
+			if (commandHistory.length > 100) commandHistory.pop();
+			historyIndex = -1;
+
+			// Display command
+			addOutput(`postgres=> ${trimmedCommand}`, 'command');
+
+			// Handle special commands
+			if (trimmedCommand.toLowerCase() === 'help') {
+				showHelp();
+				return;
+			}
+
+			if (trimmedCommand.toLowerCase() === 'clear') {
+				output.innerHTML = '';
+				return;
+			}
+
+			if (trimmedCommand.toLowerCase() === 'exit') {
+				addOutput('Goodbye!', 'info');
+				commandInput.disabled = true;
+				return;
+			}
+
+			if (trimmedCommand.toLowerCase() === '\\d' || trimmedCommand.toLowerCase() === '\\dt') {
+				await listTables();
+				return;
+			}
+
+			// Execute SQL query
+			try {
+				const result = await db.query(trimmedCommand);
+
+				if (result.rows.length === 0) {
+					if (trimmedCommand.toUpperCase().startsWith('SELECT')) {
+						addOutput('(0 rows)', 'result');
+					} else {
+						addOutput('OK', 'result');
+					}
+				} else {
+					// Display results as table
+					const columns = Object.keys(result.rows[0]);
+					addTableOutput(columns, result.rows);
+					addOutput(`(${result.rows.length} row${result.rows.length !== 1 ? 's' : ''})`, 'result');
+				}
+			} catch (error) {
+				addOutput(`ERROR: ${error.message}`, 'error');
+			}
+		}
+
+		// Event listeners
+		commandInput.addEventListener('keydown', (e) => {
+			if (e.key === 'Enter') {
+				const command = commandInput.value;
+				commandInput.value = '';
+				executeCommand(command);
+			} else if (e.key === 'ArrowUp') {
+				e.preventDefault();
+				if (historyIndex < commandHistory.length - 1) {
+					historyIndex++;
+					commandInput.value = commandHistory[historyIndex];
+				}
+			} else if (e.key === 'ArrowDown') {
+				e.preventDefault();
+				if (historyIndex > 0) {
+					historyIndex--;
+					commandInput.value = commandHistory[historyIndex];
+				} else if (historyIndex === 0) {
+					historyIndex = -1;
+					commandInput.value = '';
+				}
+			}
+		});
+
+		// Initialize on load
+		window.addEventListener('load', async () => {
+			await initializeDatabase();
+			commandInput.focus();
+		});
+	</script>
+</body>
+</html>
