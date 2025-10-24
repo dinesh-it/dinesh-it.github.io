@@ -249,7 +249,7 @@
 			<input
 				type="text"
 				id="commandInput"
-				placeholder="Enter SQL command (type 'help' for commands)"
+				placeholder="Enter SQL command (type 'help' for commands, Tab for autocomplete)"
 				spellcheck="false"
 				autocomplete="off"
 			/>
@@ -273,10 +273,23 @@
 		let db;
 		let commandHistory = [];
 		let historyIndex = -1;
+		let lastTabPrefix = '';
+		let tabMatches = [];
+		let tabMatchIndex = -1;
 
 		const output = document.getElementById('output');
 		const commandInput = document.getElementById('commandInput');
 		const status = document.getElementById('status');
+
+		// SQL Keywords for autocomplete
+		const sqlKeywords = [
+			'SELECT', 'FROM', 'WHERE', 'INSERT', 'UPDATE', 'DELETE', 'CREATE', 'DROP',
+			'TABLE', 'INDEX', 'VIEW', 'DATABASE', 'ALTER', 'ADD', 'MODIFY', 'COLUMN',
+			'PRIMARY', 'KEY', 'FOREIGN', 'REFERENCES', 'UNIQUE', 'NOT', 'NULL', 'DEFAULT',
+			'AND', 'OR', 'LIKE', 'IN', 'BETWEEN', 'EXISTS', 'GROUP', 'BY', 'ORDER', 'HAVING',
+			'INNER', 'LEFT', 'RIGHT', 'FULL', 'JOIN', 'ON', 'UNION', 'ALL', 'DISTINCT',
+			'LIMIT', 'OFFSET', 'AS', 'WITH', 'CASE', 'WHEN', 'THEN', 'ELSE', 'END'
+		];
 
 		async function initializeDatabase() {
 			try {
@@ -346,7 +359,9 @@
 			addOutput('\\dt - List tables', 'info');
 			addOutput('clear - Clear the terminal', 'info');
 			addOutput('help - Show this help message', 'info');
-			addOutput('exit - Exit the terminal\n', 'info');
+			addOutput('exit - Exit the terminal', 'info');
+			addOutput('\nNote: Each command must be a single statement. To run multiple statements, execute them separately.', 'info');
+			addOutput('Press Tab to autocomplete keywords and table names.\n', 'info');
 		}
 
 		async function listTables() {
@@ -403,10 +418,81 @@
 			}
 		}
 
+		async function getAllTableNames() {
+			try {
+				const result = await db.query(`
+					SELECT table_name
+					FROM information_schema.tables
+					WHERE table_schema = 'public'
+					ORDER BY table_name
+				`);
+				return result.rows.map(row => row.table_name);
+			} catch (error) {
+				return [];
+			}
+		}
+
+		async function getCompletions(partial) {
+			const lowerPartial = partial.toLowerCase();
+			const tables = await getAllTableNames();
+
+			// Get matching keywords
+			const keywordMatches = sqlKeywords.filter(k =>
+				k.toLowerCase().startsWith(lowerPartial)
+			);
+
+			// Get matching table names
+			const tableMatches = tables.filter(t =>
+				t.toLowerCase().startsWith(lowerPartial)
+			);
+
+			// Combine: keywords first, then tables
+			return [...keywordMatches, ...tableMatches];
+		}
+
+		async function handleTabCompletion() {
+			const input = commandInput.value;
+			const cursorPos = commandInput.selectionStart;
+
+			// Get the word before cursor
+			const beforeCursor = input.substring(0, cursorPos);
+			const words = beforeCursor.split(/\s+/);
+			const currentWord = words[words.length - 1] || '';
+
+			if (!currentWord) return;
+
+			// Check if this is a continuation of previous tab
+			if (lastTabPrefix === currentWord && tabMatches.length > 0) {
+				// Cycle to next match
+				tabMatchIndex = (tabMatchIndex + 1) % tabMatches.length;
+				const match = tabMatches[tabMatchIndex];
+				const newInput = input.substring(0, cursorPos - currentWord.length) + match;
+				commandInput.value = newInput;
+				commandInput.setSelectionRange(newInput.length, newInput.length);
+			} else {
+				// New prefix, get completions
+				lastTabPrefix = currentWord;
+				tabMatches = await getCompletions(currentWord);
+
+				if (tabMatches.length > 0) {
+					tabMatchIndex = 0;
+					const match = tabMatches[0];
+					const newInput = input.substring(0, cursorPos - currentWord.length) + match;
+					commandInput.value = newInput;
+					commandInput.setSelectionRange(newInput.length, newInput.length);
+				}
+			}
+		}
+
 		async function executeCommand(command) {
 			const trimmedCommand = command.trim();
 
 			if (!trimmedCommand) return;
+
+			// Reset tab completion state
+			lastTabPrefix = '';
+			tabMatches = [];
+			tabMatchIndex = -1;
 
 			// Add to history
 			commandHistory.unshift(trimmedCommand);
@@ -467,17 +553,24 @@
 		}
 
 		// Event listeners
-		commandInput.addEventListener('keydown', (e) => {
+		commandInput.addEventListener('keydown', async (e) => {
 			if (e.key === 'Enter') {
 				const command = commandInput.value;
 				commandInput.value = '';
 				executeCommand(command);
+			} else if (e.key === 'Tab') {
+				e.preventDefault();
+				await handleTabCompletion();
 			} else if (e.key === 'ArrowUp') {
 				e.preventDefault();
 				if (historyIndex < commandHistory.length - 1) {
 					historyIndex++;
 					commandInput.value = commandHistory[historyIndex];
 				}
+				// Reset tab completion
+				lastTabPrefix = '';
+				tabMatches = [];
+				tabMatchIndex = -1;
 			} else if (e.key === 'ArrowDown') {
 				e.preventDefault();
 				if (historyIndex > 0) {
@@ -487,6 +580,15 @@
 					historyIndex = -1;
 					commandInput.value = '';
 				}
+				// Reset tab completion
+				lastTabPrefix = '';
+				tabMatches = [];
+				tabMatchIndex = -1;
+			} else {
+				// Reset tab completion on any other key
+				lastTabPrefix = '';
+				tabMatches = [];
+				tabMatchIndex = -1;
 			}
 		});
 
