@@ -342,6 +342,7 @@
 			addOutput('CREATE TABLE ... - Create a table', 'info');
 			addOutput('DROP TABLE ... - Drop a table', 'info');
 			addOutput('\\d - List all tables', 'info');
+			addOutput('\\d <table_name> - Describe table structure', 'info');
 			addOutput('\\dt - List tables', 'info');
 			addOutput('clear - Clear the terminal', 'info');
 			addOutput('help - Show this help message', 'info');
@@ -368,6 +369,37 @@
 				}
 			} catch (error) {
 				addOutput(`Error: ${error.message}`, 'error');
+			}
+		}
+
+		async function describeTable(tableName) {
+			try {
+				const result = await db.query(`
+					SELECT
+						column_name,
+						data_type,
+						is_nullable,
+						column_default
+					FROM information_schema.columns
+					WHERE table_name = $1 AND table_schema = 'public'
+					ORDER BY ordinal_position
+				`, [tableName]);
+
+				if (result.rows.length === 0) {
+					addOutput(`ERROR: table "${tableName}" does not exist`, 'error');
+				} else {
+					addOutput(`\nTable "${tableName}":`, 'info');
+					const columns = ['Column', 'Type', 'Nullable', 'Default'];
+					const rows = result.rows.map(row => ({
+						'Column': row.column_name,
+						'Type': row.data_type,
+						'Nullable': row.is_nullable === 'YES' ? 'YES' : 'NO',
+						'Default': row.column_default || '-'
+					}));
+					addTableOutput(columns, rows);
+				}
+			} catch (error) {
+				addOutput(`ERROR: ${error.message}`, 'error');
 			}
 		}
 
@@ -403,6 +435,13 @@
 
 			if (trimmedCommand.toLowerCase() === '\\d' || trimmedCommand.toLowerCase() === '\\dt') {
 				await listTables();
+				return;
+			}
+
+			// Handle \d <table_name> command
+			if (trimmedCommand.toLowerCase().startsWith('\\d ')) {
+				const tableName = trimmedCommand.substring(3).trim();
+				await describeTable(tableName);
 				return;
 			}
 
