@@ -259,6 +259,10 @@
         }
 
         /* App Icons */
+        .app-icon {
+            margin-bottom: 1rem;
+        }
+
         .app-icon img {
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             box-shadow: 0 8px 25px var(--shadow);
@@ -267,6 +271,11 @@
         .app-icon img:hover {
             transform: scale(1.05);
             box-shadow: 0 12px 35px var(--shadow);
+        }
+
+        /* Icon containers for Font Awesome icons */
+        .product-card > div[style*="display: flex"][style*="justify-content: center"] {
+            margin-bottom: 1rem;
         }
 
         .product-icon {
@@ -630,21 +639,19 @@
                 </div>
                 <div class="col-lg-4 mb-4">
                     <div class="product-card text-center">
-                        <div style="display: flex; justify-content: center; mb-3;">
-                            <div style="width: 100px; height: 100px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 20px; display: flex; align-items: center; justify-content: center; color: white;">
-                                <i class="fas fa-table" style="font-size: 2.5rem;"></i>
-                            </div>
+                        <div class="app-icon mx-auto mb-3">
+                            <img src="https://queryjson.com/static/images/android-chrome-192x192.png" alt="QueryJSON Icon" style="width: 100px; height: 100px; border-radius: 20px; object-fit: cover;">
                         </div>
-                        <h3 class="mb-3">JSON2Table</h3>
-                        <p class="mb-4">A powerful in-browser JSON to table converter with advanced features. Parse JSON data, visualize as tables, filter and sort columns, perform SQL queries with PGLite, and export results as CSV or JSON. Perfect for data analysis and exploration.</p>
+                        <h3 class="mb-3">QueryJSON</h3>
+                        <p class="mb-4">A free, browser-based tool for converting and analyzing structured data. Transform JSON, XML, and CSV formats into interactive tables. Apply filters, execute SQL queries with PostgreSQL (PGLite), and use JSONPath to extract nested data—all without uploading to external servers.</p>
                         <div class="mb-3">
-                            <span class="badge bg-info me-2">JSON Parser</span>
-                            <span class="badge bg-primary me-2">PostgreSQL</span>
-                            <span class="badge bg-success">Export Tools</span>
+                            <span class="badge bg-info me-2">JSON/XML/CSV</span>
+                            <span class="badge bg-primary me-2">SQL Queries</span>
+                            <span class="badge bg-success">Data Export</span>
                         </div>
                         <div class="mt-3">
-                            <a href="json-to-table-converter.html" class="btn btn-sm me-2" style="background: linear-gradient(45deg, #667eea, #764ba2); color: white; border: none; border-radius: 20px; padding: 8px 20px;">
-                                <i class="fas fa-play me-1"></i>Try It Now
+                            <a href="https://queryjson.com" target="_blank" class="btn btn-sm me-2" style="background: linear-gradient(45deg, #667eea, #764ba2); color: white; border: none; border-radius: 20px; padding: 8px 20px;">
+                                <i class="fas fa-external-link-alt me-1"></i>Visit Site
                             </a>
                         </div>
                     </div>
@@ -822,9 +829,9 @@
                     <div class="col-lg-8 mx-auto text-center">
                      <div class="mb-4">
                         <p class="mb-4" style="font-size: 1.2rem; color: var(--text-light);">
-                            <strong>dd.dinesh.rajakumar@gmail.com</strong>
+                            <strong>contact@dineshdtech.in</strong>
                         </p>
-                        <a href="mailto:dd.dinesh.rajakumar@gmail.com" class="btn btn-primary-custom btn-lg">Send Me an Email</a>
+                        <a href="mailto:contact@dineshdtech.in" class="btn btn-primary-custom btn-lg">Send Me an Email</a>
                     </div>
                 </div>
         </div>
@@ -842,7 +849,7 @@
                         <a href="https://www.linkedin.com/in/dineshdharmalingam/" target="_blank" class="social-link" title="LinkedIn">
                             <i class="fab fa-linkedin"></i>
                         </a>
-                        <a href="mailto:dd.dinesh.rajakumar@gmail.com" class="social-link" title="Email">
+                        <a href="mailto:contact@dineshdtech.in" class="social-link" title="Email">
                             <i class="fas fa-envelope"></i>
                         </a>
                     </div>
@@ -939,6 +946,50 @@
                 navbar.style.opacity = '0.95';
             }
         });
+
+        // Fetch GitHub stats dynamically
+        async function fetchGitHubStats() {
+            const username = 'dinesh-it';
+            try {
+                // Fetch user data
+                const userResponse = await fetch(`https://api.github.com/users/${username}`);
+                const userData = await userResponse.json();
+
+                // Fetch repositories
+                const reposResponse = await fetch(`https://api.github.com/users/${username}/repos?per_page=100`);
+                const reposData = await reposResponse.json();
+
+                if (!userResponse.ok || !reposResponse.ok) {
+                    console.error('GitHub API error');
+                    return;
+                }
+
+                // Calculate stats
+                const publicRepos = userData.public_repos;
+                const followers = userData.followers;
+                const totalStars = reposData.reduce((sum, repo) => sum + repo.stargazers_count, 0);
+
+                // Update the DOM with dynamic data
+                const statItems = document.querySelectorAll('.stat-item');
+                if (statItems.length >= 3) {
+                    // Update Public Repositories
+                    statItems[0].querySelector('.stat-number').textContent = publicRepos;
+                    // Update GitHub Stars
+                    statItems[1].querySelector('.stat-number').textContent = totalStars;
+                    // Update Followers
+                    statItems[2].querySelector('.stat-number').textContent = followers;
+                }
+            } catch (error) {
+                console.error('Error fetching GitHub stats:', error);
+            }
+        }
+
+        // Fetch GitHub stats when page loads
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', fetchGitHubStats);
+        } else {
+            fetchGitHubStats();
+        }
 
         // Animation on scroll
         const observerOptions = {

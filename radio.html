@@ -6,28 +6,17 @@ redirect_from: "/radio/"
 <!DOCTYPE html>
 <html>
 	<head>
-		<!-- Global site tag (gtag.js) - Google Analytics -->
-		<script async src="https://www.googletagmanager.com/gtag/js?id=UA-113057440-3"></script>
-		<script>
-			window.dataLayer = window.dataLayer || [];
-			function gtag(){dataLayer.push(arguments);}
-			gtag('js', new Date());
-			gtag('config', 'UA-113057440-3');
-		</script>
-
 		<meta charset="utf-8" />
 		<title>Tamil Online Radios</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 		<meta name="title" property="og:title" content="Tamil Radio - Online" />
-		<meta name="description" property="og:description" content="Listen to unlimited tamil songs from 100+ channels worldwide. Ilayaraja, ARRahman, US Tamil FM, Yuvan Hits etc..." />
+		<meta name="description" property="og:description" content="Listen to Tamil radio streams from 11 verified working channels worldwide. High-quality audio streaming with favorites and search functionality." />
+	<meta name="theme-color" content="#59a05a" />
+	<link rel="icon" type="image/png" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%2359a05a'/><path d='M50 20 L65 40 L65 60 Q50 70 35 60 L35 40 Z' fill='white'/><circle cx='45' cy='50' r='3' fill='%2359a05a'/></svg>" />
 
-		<!-- JQuery 3.2.1 -->
-		<script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
-
-		<!-- Bootstrap 3.3.7 -->
-		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+		<!-- jQuery 3.7.1 -->
+		<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 
 		<!-- Font awsome -->
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -35,70 +24,48 @@ redirect_from: "/radio/"
 		<!-- jPlayer 2.9.2 -->
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/jplayer/2.9.2/jplayer/jquery.jplayer.min.js"></script>
 
-		<script src="https://tnlite.github.io/static/tn.js"></script>
-
-		<!-- jPList Core -->		
-		<link href="css/jplist.core.min.css" rel="stylesheet" type="text/css" />
-		<script src="js/jplist.core.min.js"></script>	
-
-		<!-- Textbox Control -->			
-		<link href="css/jplist.textbox-filter.min.css" rel="stylesheet" type="text/css" />
-		<script src="js/jplist.textbox-filter.min.js"></script>
+		<script src="js/radio-channels.js"></script>
 
 		<script type="text/javascript">
 			//<![CDATA[
 		$(document).ready(function(){
 
-			var stop_class = 'glyphicon-stop';
-			var play_class = 'glyphicon-play';
-			var fav_class = 'glyphicon-star';
-			var de_fav_class = 'glyphicon-star-empty';
-			var tile_view_class = 'glyphicon-th';
-			var list_view_class = 'glyphicon-list';
+			// Initialize dark mode preference
+			var darkMode = localStorage.getItem('darkMode') === 'true';
+			if (darkMode) {
+				$('body').addClass('dark-mode');
+				$('#dark-mode-toggle').attr('data-active', 'true');
+			}
+
+			var stop_class = 'fa-stop';
+			var play_class = 'fa-play';
+			var fav_class = 'fa-star';
+			var de_fav_class = 'fa-star-o';
+			var tile_view_class = 'fa-th';
+			var list_view_class = 'fa-list';
 			var last_fm_div = '';
 			var radio_list_div = $('#radio-list');
 			var safari_ua = 0;
+			var notificationTimeout = null;
 
 			var ua = navigator.userAgent.toLowerCase(); 
 			if (ua.indexOf('safari') != -1 && ua.indexOf('chrome') < 1) {
 				safari_ua = 1;
 			}
 
-			var favorites;
-			if(!safari_ua) {
-				localStorage.getItem('favorites');
-			}
-			else {
-				$('#show_fav').hide();
-				console.log("Found this UA as Safari, So favorites should not work");
-			}
-
-			if(!favorites){
-				favorites = {};
-			}
-			else {
-				favorites = JSON.parse(favorites);
-			}
 
 			//$('#sleep_input').slider();
 			var get_list = function(json) {
 				var sample_div = $('<div class="list_element">'
-					+ '<div class="art"><span class="glyphicon glyphicon-music" aria-hidden="true"></span></div>'
+					+ '<div class="art"><span class="fa fa-music" aria-hidden="true"></span></div>'
 					+ '<div class="details">'
-					+ '<label class="radio_name">AR Rahman</label><br/>'
+					+ '<label class="radio_name">AR Rahman</label>'
 					+ '<p class="title">All time hits<p></div>'
-					+ '<span class="glyphicon glyphicon-star-empty right btn-icon favorite" aria-hidden="true"></span></div>'
+					+ '</div>'
 				);
 				sample_div.find('label').text(json.title);
 				sample_div.find('p').text(json.link);
 				sample_div.attr('data-link',json.mp3);
-				if(safari_ua) {
-					sample_div.find('.favorite').hide();
-				}
-				if(favorites[json.mp3]){
-					sample_div.find('.favorite').removeClass(de_fav_class).addClass(fav_class);
-					sample_div.addClass('favorite');
-				}
 				return sample_div;
 			};
 
@@ -130,11 +97,30 @@ redirect_from: "/radio/"
 				song_title();
 			}, 30000);
 
-			var show_info = function(title,msg) {
+			var show_info = function(title, msg, type) {
 				var box = $('#info-box');
+				type = type || 'info'; // 'info', 'error', 'success'
+				box.removeClass('info-error info-success info-loading');
+
+				if (type === 'error') {
+					box.addClass('info-error');
+				} else if (type === 'success') {
+					box.addClass('info-success');
+				} else if (title.toLowerCase().includes('loading')) {
+					box.addClass('info-loading');
+				}
+
 				box.find('label').text(title);
 				box.find('p').text(msg);
 				box.show();
+
+				// Auto-hide success and error messages after 4 seconds
+				if (type === 'error' || type === 'success') {
+					clearTimeout(notificationTimeout);
+					notificationTimeout = setTimeout(function() {
+						box.fadeOut(300);
+					}, 4000);
+				}
 			}
 
 			var wait_sec = 0;
@@ -186,7 +172,7 @@ redirect_from: "/radio/"
 			//});
 
 			$(document).on($.jPlayer.event.ended, function() {
-				alert("Stream ended...!");
+				show_info("Stream Ended", "The radio stream has ended.", "info");
 			});
 
 			$(document).on($.jPlayer.event.stalled, function() {
@@ -194,7 +180,8 @@ redirect_from: "/radio/"
 			});
 
 			$(document).on($.jPlayer.event.error, function(a,b) {
-				console.log('Error...');
+				console.log('Playback error:', a, b);
+				show_info("Connection Error", "Attempting to reconnect...", "error");
 				retry_play();
 			});
 
@@ -204,7 +191,28 @@ redirect_from: "/radio/"
 
 			var jp = $("#jquery_jplayer_1").jPlayer({
 				swfPath: "https://cdnjs.cloudflare.com/ajax/libs/jplayer/2.9.2/jplayer/jquery.jplayer.swf",
-				supplied: "mp3, oga", 
+				supplied: "mp3, oga",
+				volume: 0.8
+			});
+
+			// Volume control
+			$('#volume-slider').on('input', function() {
+				var volume = $(this).val() / 100;
+				jp.jPlayer('volume', volume);
+				$('#volume-value').text(Math.round(volume * 100) + '%');
+			});
+
+			// Initialize volume display
+			$('#volume-slider').val(80);
+			$('#volume-value').text('80%');
+
+			// Dark mode toggle
+			$('#dark-mode-toggle').on('click', function() {
+				darkMode = !darkMode;
+				$('body').toggleClass('dark-mode');
+				localStorage.setItem('darkMode', darkMode);
+				$(this).attr('data-active', darkMode ? 'true' : 'false');
+				show_info('Theme Changed', darkMode ? 'Dark mode enabled' : 'Light mode enabled', 'success');
 			});
 
 			var playing_div_top = 0;
@@ -246,42 +254,6 @@ redirect_from: "/radio/"
 				}
 			});
 
-			$(document).on('click','span.favorite', function(e) {
-				e.stopPropagation();
-				var sel = $(this);
-				var parent = sel.parent();
-				var link = parent.data('link');
-				if(sel.hasClass(de_fav_class)){
-					sel.removeClass(de_fav_class);
-					sel.addClass(fav_class);
-					parent.addClass('favorite');
-					favorites[link] = 1;
-				}
-				else {
-					sel.removeClass(fav_class);
-					sel.addClass(de_fav_class);
-					parent.removeClass('favorite');
-					delete favorites[link];
-				}
-				localStorage.setItem('favorites', JSON.stringify(favorites));
-			});
-
-			$('#show_fav').on('click',function(){
-				var btn = $(this);
-				var list = $('#radio-list');
-				if(btn.hasClass('show_fav')){
-					btn.removeClass('show_fav');
-					btn.removeClass(de_fav_class);
-					btn.addClass(fav_class);
-					list.find(".list_element:not(.favorite)").hide();
-				}
-				else {
-					btn.addClass('show_fav');
-					btn.removeClass(fav_class);
-					btn.addClass(de_fav_class);
-					list.find("div:not([class='favorite'])").show();
-				}
-			});
 
 			$('#toggle_view').on('click', function() {
 				if($('#radio-list div:first').hasClass('tile_view')) {
@@ -303,34 +275,18 @@ redirect_from: "/radio/"
 					mp3: link
 				};
 				var div = get_list(temp);
+				div.addClass('tile_view');
 				radio_list_div.append(div);
 			});
 
+			// Set initial toggle button state for tile view
+			$('#toggle_view').removeClass('fa-th');
+			$('#toggle_view').addClass('fa-list');
+
 			$('#info-box').hide();
 
-			$(window).bind("beforeunload", function() { 
-				return $('#play_btn').hasClass(play_class) ? null : "Do you want to stop and exit?"; 
-			});
-
-			$('body').jplist({				
-				itemsBox: '#radio-list', 
-				itemPath: '.list_element',
-				panelPath: '.jplist-panel'	
-			});
-
-			$(window).bind('keydown', function(event) {
-				if (event.ctrlKey || event.metaKey) {
-					switch (String.fromCharCode(event.which).toLowerCase()) {
-						case 's':
-							event.preventDefault();
-							$('#radio-search').focus();
-							break;
-						case 'f':
-							event.preventDefault();
-							$('#radio-search').focus();
-							break;
-					}
-				}
+			$(window).bind("beforeunload", function() {
+				return $('#play_btn').hasClass(play_class) ? null : "Do you want to stop and exit?";
 			});
 
 			window.displayBoxIndex = -1;
@@ -398,18 +354,53 @@ redirect_from: "/radio/"
 		//]]>
 	</script>
 	<style>
+		* {
+			box-sizing: border-box;
+		}
+
+		:root {
+			--primary-color: #59a05a;
+			--primary-dark: #3c763d;
+			--secondary-color: #3b5998;
+			--bg-light: #ffffff;
+			--text-light: #333333;
+			--border-light: #e0e0e0;
+			--success-color: #28a745;
+			--error-color: #dc3545;
+			--warning-color: #ffc107;
+		}
+
+		body.dark-mode {
+			--bg-light: #1e1e1e;
+			--text-light: #e0e0e0;
+			--border-light: #444444;
+		}
+
+		body {
+			margin: 0;
+			padding: 0;
+			background-color: var(--bg-light);
+			color: var(--text-light);
+			transition: background-color 0.3s ease, color 0.3s ease;
+			font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+		}
+
 		.list_element {
-			border-bottom: 1px solid grey;
+			border-bottom: 1px solid var(--border-light);
 			height: 48px;
 			margin-bottom: 1px;
 			padding: 5px;
+			display: flex;
+			align-items: center;
+			transition: background-color 0.2s ease;
 		}
+
 		.list_element label {
 			margin-bottom: 0px;
+			font-weight: 500;
+			line-height: 1;
 		}
-		.icon-btn {
 
-		}
 		.list_element p {
 			margin-top: 1px;
 			font-size: 10px;
@@ -418,157 +409,417 @@ redirect_from: "/radio/"
 			text-overflow: ellipsis;
 			display: -webkit-box;
 			-webkit-box-orient: vertical;
-			-webkit-line-clamp: 2; /* number of lines to show */
-			line-height: 10px;        /* fallback */
-			max-height: 20px;  
+			-webkit-line-clamp: 2;
+			line-height: 10px;
+			max-height: 20px;
 		}
+
 		.list_element .art {
 			height: 35px;
 			width: 35px;
-			display: inline-block;
-			background: lightgrey;
-			float: left;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+			flex-shrink: 0;
+			margin-right: 10px;
 			padding: 5px;
 			font-size: 23px;
+			color: white;
+			border-radius: 4px;
+			transition: transform 0.2s ease, box-shadow 0.2s ease;
 		}
+
+		.list_element .art:hover {
+			transform: scale(1.05);
+		}
+
 		.list_element .details {
-			display: inline-block;
-			margin-left: 10px;
+			flex: 1;
+			overflow: hidden;
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			margin-top: 18px;
 		}
+
 		#title-bar {
-			border-bottom: 1px solid grey;
-			height: 40px;
-			margin-bottom: 1px;
+			border-bottom: 1px solid var(--border-light);
+			height: 50px;
 			padding: 5px;
-			text-align: center;
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 10px;
+			background-color: var(--bg-light);
+			box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 		}
+
+		#title-bar label {
+			font-size: 18px;
+			font-weight: bold;
+			margin: 0;
+			margin-right: auto;
+		}
+
+		#title-bar .button-group {
+			display: flex;
+			align-items: center;
+			gap: 10px;
+			margin-left: auto;
+			flex-shrink: 0;
+		}
+
 		#title-bar button {
-			height: 28px;
-			margin-right: 3px;
+			height: 36px;
+			padding: 8px 12px;
+			border: none;
+			background: none;
+			cursor: pointer;
+			font-size: 18px;
+			transition: color 0.2s ease, transform 0.1s ease;
+			border-radius: 4px;
 		}
-		#title-bar span {
-			padding-left: 8px;
-			padding-right: 8px;
-			text-align: center;
-			font-size: 20px;
+
+		#title-bar button:hover {
+			color: var(--primary-color);
+			transform: scale(1.1);
 		}
-		#advertisement {
-			border-bottom: 1px solid grey;
-			height: 40px;
-			margin-bottom: 1px;
-			padding: 10px;
-			text-align: center;
+
+		#title-bar button:active {
+			transform: scale(0.95);
 		}
+
 		#radio-list {
-			height: 80vh;
-			overflow: auto;
+			height: calc(100vh - 100px);
+			overflow-y: auto;
+			overflow-x: hidden;
 		}
+
 		#player {
 			position: fixed;
 			width: 100%;
-			left: 0vw;
-			bottom: 0vh;
-			background: #FFFFFF;
+			left: 0;
+			bottom: 0;
+			background: var(--bg-light);
 			height: 50px;
-			right: 1px;
 			padding: 8px;
-			text-align: center;
-			font-size: 28px;
-			letter-spacing: 16px;
-			box-shadow: 0px -1px 10px rgba(50, 50, 50, 0.75);
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			gap: 8px;
+			border-top: 1px solid var(--border-light);
+			box-shadow: 0 -2px 8px rgba(0,0,0,0.15);
+			z-index: 50;
 		}
+
 		.left {
-			float: left;
+			margin-right: auto;
 		}
+
 		.right {
-			float: right;
+			margin-left: auto;
 		}
-		span.btn-icon {
-			font-size: 24px;
-			line-height: 24px;
-			padding: 6px;
-		}
-		button.glyphicon-play {
-			color: green;
-		}
-		button.glyphicon-stop {
-			color: red;
-		}
-		div.selected {
-			box-shadow: 3px 3px 15px #666;
-			border-color:#3c763d;
-			background: #59a05a;
-			color: #fff;
-			cursor: pointer;
-			text-shadow: 1px 1px 1px #666;
-		}
-		div.selected .art {
-			box-shadow: 2px 2px 10px #666;
-			color: green;
-		}
-		div.info {
-			position: absolute;
-			z-index: 99;
-			background: #efda8e;
-			border-radius: 10px;
-			padding-left: 12px;
-			padding-right: 12px;
-			text-align: center;
-			top: 16px;
-			left: 40vw;
-			padding-top: 4px;
-			padding-bottom: 0px;
-		}
-		span.glyphicon-star {
-			color: yellow;
-			text-shadow: 1px 1px 6px #666;
-		}
+
+		span.btn-icon,
 		button {
-			text-shadow: 1px 1px 10px #666;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			height: 36px;
+			width: 36px;
+			border: none;
+			background: none;
+			cursor: pointer;
+			font-size: 20px;
+			border-radius: 6px;
+			transition: all 0.2s ease;
+			color: var(--text-light);
 		}
+
+		button:hover {
+			background-color: rgba(89, 160, 90, 0.1);
+			color: var(--primary-color);
+			transform: scale(1.1);
+		}
+
+		button:active {
+			transform: scale(0.95);
+		}
+
+		button.fa-play {
+			color: var(--success-color);
+		}
+
+		button.fa-play:hover {
+			background-color: rgba(40, 167, 69, 0.1);
+		}
+
+		button.fa-stop {
+			color: var(--error-color);
+		}
+
+		button.fa-stop:hover {
+			background-color: rgba(220, 53, 69, 0.1);
+		}
+
 		button.inactive {
-			text-shadow: 0px 0px 0px;
-			color: grey;
+			opacity: 0.5;
+			cursor: not-allowed;
 		}
+
+		button.inactive:hover {
+			transform: none;
+		}
+
+		div.selected {
+			background: var(--primary-color);
+			color: #fff;
+			border-left: 4px solid var(--primary-dark);
+			box-shadow: inset 0 2px 8px rgba(0,0,0,0.2);
+		}
+
+		div.selected .art {
+			background: linear-gradient(135deg, #4a7c4d, #2d5a2f);
+			color: #fff;
+			box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+		}
+
+		#info-box {
+			position: fixed;
+			top: 60px;
+			left: 50%;
+			transform: translateX(-50%);
+			z-index: 999;
+			border-radius: 8px;
+			padding: 12px 20px;
+			text-align: center;
+			box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+			max-width: 90vw;
+			animation: slideDown 0.3s ease;
+			min-width: 200px;
+		}
+
+		#info-box label {
+			margin: 0;
+			font-weight: bold;
+			display: block;
+		}
+
+		#info-box p {
+			margin: 4px 0 0 0;
+			font-size: 12px;
+		}
+
+		#info-box.info-loading {
+			background: linear-gradient(135deg, #3498db, #2980b9);
+			color: white;
+		}
+
+		#info-box.info-error {
+			background: linear-gradient(135deg, #e74c3c, #c0392b);
+			color: white;
+		}
+
+		#info-box.info-success {
+			background: linear-gradient(135deg, #27ae60, #229954);
+			color: white;
+		}
+
+		#info-box {
+			background: #f0f0f0;
+			color: #333;
+		}
+
+		body.dark-mode #info-box {
+			background: #333;
+			color: #f0f0f0;
+		}
+
+		@keyframes slideDown {
+			from {
+				opacity: 0;
+				transform: translateX(-50%) translateY(-20px);
+			}
+			to {
+				opacity: 1;
+				transform: translateX(-50%) translateY(0);
+			}
+		}
+
+
 		.list_element.tile_view {
-			border: 1px solid black;
-			box-shadow: 1px 1px 5px #666;
-			margin: 1px;
-			height: 50px;
-			padding: 5px;
+			border: 1px solid var(--border-light);
+			box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+			margin: 4px;
+			height: auto;
+			padding: 8px;
 			min-width: 100px;
-			display: inline-block !important;
+			display: inline-flex !important;
+			flex-direction: column;
+			align-items: center;
+			justify-content: flex-start;
+			text-align: center;
+			border-radius: 6px;
+			transition: all 0.2s ease;
+			position: relative;
 		}
+
+		.list_element.tile_view:hover {
+			box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+			transform: translateY(-2px);
+		}
+
+		.list_element.tile_view .art {
+			margin-right: 0;
+			margin-bottom: 8px;
+			height: 45px;
+			width: 45px;
+			font-size: 28px;
+		}
+
 		.details.tile_view {
-			width: 80px;
-			vertical-align: middle;
-			line-height: 15px;
+			width: 85px;
+			line-height: 14px;
+			flex-grow: 1;
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
 		}
+
 		.tile_view p {
 			display: none;
 		}
 
-		.list_element_hover, .list_element:hover
-		{
-			background:#3b5998;
-			color:#FFFFFF;
+		.tile_view label {
+			font-size: 12px;
+			margin-bottom: 0px;
 		}
+
+		.list_element_hover,
+		.list_element:hover {
+			background: var(--secondary-color);
+			color: #FFFFFF;
+		}
+
 		.list_element_fixed_top {
 			position: fixed;
-			top: 40px;
+			top: 50px;
 			width: 100%;
 			z-index: 100;
-			background: #59a05a;
+			background: var(--primary-color);
 			color: #fff;
+			box-shadow: 0 2px 8px rgba(0,0,0,0.2);
 		}
+
 		.list_element_fixed_bottom {
 			position: fixed;
-			bottom: 48px;
+			bottom: 50px;
 			width: 100%;
 			z-index: 100;
-			background: #59a05a;
+			background: var(--primary-color);
 			color: #fff;
-			box-shadow: 3px 0px 12px #666;
+			box-shadow: 0 -2px 8px rgba(0,0,0,0.2);
+		}
+
+		#dark-mode-toggle {
+			position: relative;
+		}
+
+		#dark-mode-toggle[data-active="true"] {
+			color: var(--warning-color);
+		}
+
+		#volume-control {
+			display: flex;
+			align-items: center;
+			gap: 6px;
+			padding: 0 8px;
+		}
+
+		#volume-slider {
+			width: 100px;
+			height: 4px;
+			border-radius: 2px;
+			background: var(--border-light);
+			outline: none;
+			-webkit-appearance: none;
+			appearance: none;
+		}
+
+		#volume-slider::-webkit-slider-thumb {
+			-webkit-appearance: none;
+			appearance: none;
+			width: 16px;
+			height: 16px;
+			border-radius: 50%;
+			background: var(--primary-color);
+			cursor: pointer;
+			transition: background 0.2s ease;
+		}
+
+		#volume-slider::-webkit-slider-thumb:hover {
+			background: var(--primary-dark);
+		}
+
+		#volume-slider::-moz-range-thumb {
+			width: 16px;
+			height: 16px;
+			border-radius: 50%;
+			background: var(--primary-color);
+			cursor: pointer;
+			border: none;
+			transition: background 0.2s ease;
+		}
+
+		#volume-slider::-moz-range-thumb:hover {
+			background: var(--primary-dark);
+		}
+
+		#volume-value {
+			min-width: 40px;
+			text-align: right;
+			font-size: 12px;
+			font-weight: bold;
+		}
+
+		/* Accessibility improvements */
+		button:focus,
+		input:focus {
+			outline: 2px solid var(--primary-color);
+			outline-offset: 2px;
+		}
+
+		@media (max-width: 768px) {
+			#radio-list {
+				height: calc(100vh - 100px);
+			}
+
+			#volume-control {
+				display: none;
+			}
+
+			.list_element.tile_view {
+				min-width: 80px;
+			}
+		}
+
+		/* Scrollbar styling */
+		#radio-list::-webkit-scrollbar {
+			width: 8px;
+		}
+
+		#radio-list::-webkit-scrollbar-track {
+			background: var(--bg-light);
+		}
+
+		#radio-list::-webkit-scrollbar-thumb {
+			background: var(--primary-color);
+			border-radius: 4px;
+		}
+
+		#radio-list::-webkit-scrollbar-thumb:hover {
+			background: var(--primary-dark);
 		}
 	</style>
 </head>
@@ -576,36 +827,20 @@ redirect_from: "/radio/"
 	<div id="info-box" class="info"><label>Loading...</label><br/><p></p></div>
 	<div id="jquery_jplayer_1" class="jp-jplayer"></div>
 	<div id="title-bar">
-		<a id="app-download" class="left" aria-hidden="true" href="https://play.google.com/store/apps/details?id=com.liteindia.TamilRadio&referrer=utm_source%3Ddinesh%26utm_medium%3Dlink" target="_blank"><img style="height: 38px; width: 100px;margin-top: -5px;" src="images/googleplay.png"></a>
-		<button class="hide glyphicon glyphicon glyphicon-menu-hamburger left inactive" aria-hidden="true"></button>
-		<button class="hide glyphicon glyphicon-list-alt left inactive" aria-hidden="true"></button>
 		<label>Tamil Radio</label>
-		<!-- filter by title -->
-		<button id="share-photo" class="hide glyphicon glyphicon-share-alt right inactive" aria-hidden="true"></button>
-		<div class="right search-bar">
-			<div class="text-filter-box jplist-panel">
-				<input id="radio-search" data-path=".radio_name" 
-				type="text" 
-				class="jplist-no-right-border"
-				placeholder="Search (Ctrl + S)" 
-				data-control-type="textbox" 
-				data-control-name="title-filter" 
-				data-control-action="filter"
-				/>
-
-				<!-- clear textbox button -->
-				<i class="fa fa-times-circle jplist-clear" data-type="clear"></i>
-			</div>
+		<div class="button-group">
+			<button id="toggle_view" class="fa fa-th" aria-label="Toggle view" title="Toggle list/tile view"></button>
+			<button id="dark-mode-toggle" class="fa fa-adjust" aria-label="Toggle dark mode" title="Toggle dark/light mode"></button>
 		</div>
 	</div>
 	<div id="radio-list"></div>
 	<div id="player">
-		<!-- <input id="sleep_input" type="text" data-slider-min="0" data-slider-max="120" data-slider-step="1" data-slider-value="0" data-slider-orientation="vertical"/> -->
-		<button class="hide glyphicon glyphicon-time inactive" aria-hidden="true"></button>
-		<button id="show_fav" class="glyphicon glyphicon-star-empty show_fav" aria-hidden="true"></button>
-		<button id="play_btn" class="glyphicon glyphicon-play" aria-hidden="true"></button>
-		<button id="toggle_view" class="glyphicon glyphicon-th" aria-hidden="true"></button>
-		<button class="hide glyphicon glyphicon-comment inactive" aria-hidden="true"></button>
+		<button id="play_btn" class="fa fa-play" aria-label="Play/Pause" title="Play selected radio"></button>
+		<div id="volume-control">
+			<span class="fa fa-volume-down" title="Volume"></span>
+			<input type="range" id="volume-slider" min="0" max="100" value="80" aria-label="Volume control">
+			<span id="volume-value">80%</span>
+		</div>
 	</div>
 	<div id="corss-data"></div>
 </body>
